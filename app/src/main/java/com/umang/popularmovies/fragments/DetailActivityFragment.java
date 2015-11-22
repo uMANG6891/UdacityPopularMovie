@@ -22,6 +22,9 @@ import com.umang.popularmovies.data.Constants.MOVIE_JSON;
 
 import java.util.HashMap;
 
+import butterknife.Bind;
+import butterknife.ButterKnife;
+
 /**
  * Created by umang on 21/11/15.
  */
@@ -29,10 +32,22 @@ public class DetailActivityFragment extends Fragment {
 
     FragmentActivity con;
 
-    ImageView ivBackdrop, ivPoster;
-    TextView tvMovieName, tvReleaseDate, tvVotes, tvRating, tvOverview;
-    RelativeLayout rlPoster;
-    LinearLayout firstViewInScrollBar;
+    @Bind(R.id.frag_d_iv_backdrop)
+    ImageView ivBackdrop;
+    @Bind(R.id.frag_d_iv_poster)
+    ImageView ivPoster;
+    @Bind(R.id.frag_d_tv_movie_name)
+    TextView tvMovieName;
+    @Bind(R.id.frag_d_tv_release_date)
+    TextView tvReleaseDate;
+    @Bind(R.id.frag_d_tv_votes)
+    TextView tvVotes;
+    @Bind(R.id.frag_d_tv_rating)
+    TextView tvRating;
+    @Bind(R.id.frag_d_tv_overview)
+    TextView tvOverview;
+    @Bind(R.id.frag_d_rl_poster_layout)RelativeLayout rlPoster;
+    @Bind(R.id.frag_d_first_element)LinearLayout firstViewInScrollBar;
 
     @Nullable
     @Override
@@ -41,21 +56,13 @@ public class DetailActivityFragment extends Fragment {
         con = getActivity();
 
         View view = inflater.inflate(R.layout.fragment_detail, container, false);
-        ivBackdrop = (ImageView) view.findViewById(R.id.frag_d_iv_backdrop);
-        ivPoster = (ImageView) view.findViewById(R.id.frag_d_iv_poster);
+        ButterKnife.bind(this, view);
 
-        tvMovieName = (TextView) view.findViewById(R.id.frag_d_tv_movie_name);
-        tvReleaseDate = (TextView) view.findViewById(R.id.frag_d_tv_release_date);
-        tvVotes = (TextView) view.findViewById(R.id.frag_d_tv_votes);
-        tvRating = (TextView) view.findViewById(R.id.frag_d_tv_rating);
-        tvOverview = (TextView) view.findViewById(R.id.frag_d_tv_overview);
 
         int width = Utility.getScreenWidth(con);
         int height = (int) (width * Constants.MOVIE_BACKDROP_MULTIPLIER);
-        rlPoster = (RelativeLayout) view.findViewById(R.id.frag_d_rl_poster_layout);
         rlPoster.setLayoutParams(new LinearLayout.LayoutParams(width, height));
 
-        firstViewInScrollBar = (LinearLayout) view.findViewById(R.id.frag_d_first_element);
 
         Intent intent = con.getIntent();
         if (intent != null && intent.hasExtra(DetailActivity.EXTRA_MOVIE_DATA)) {

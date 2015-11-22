@@ -10,18 +10,22 @@ import android.view.WindowManager;
 
 import com.umang.popularmovies.fragments.DetailActivityFragment;
 
+import butterknife.Bind;
+import butterknife.ButterKnife;
+
 /**
  * Created by umang on 21/11/15.
  */
 public class DetailActivity extends AppCompatActivity {
 
     public static final String EXTRA_MOVIE_DATA = "extra_movie_data";
+    @Bind(R.id.toolbar) Toolbar toolbar;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_detail);
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        ButterKnife.bind(this);
         setSupportActionBar(toolbar);
 
         ActionBar actionbar = getSupportActionBar();

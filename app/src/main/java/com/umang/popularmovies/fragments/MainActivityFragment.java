@@ -43,15 +43,20 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+import butterknife.Bind;
+import butterknife.BindString;
+import butterknife.ButterKnife;
+
 /**
  * A placeholder fragment containing a simple view.
  */
 public class MainActivityFragment extends Fragment {
 
     FragmentActivity con;
-    GridView gvPosters;
-    ProgressBar pbLoading;
-    TextView tvErrorInfo;
+
+    @Bind(R.id.main_gv_posters) GridView gvPosters;
+    @Bind(R.id.main_pb_loading_network)  ProgressBar pbLoading;
+    @Bind(R.id.main_tv_error_text) TextView tvErrorInfo;
 
     SharedPreferences.Editor editor;
     AdapterPosters adapter;
@@ -66,8 +71,8 @@ public class MainActivityFragment extends Fragment {
     // movie related urls and image sizes
 
     public static final String BASE_IMAGE_URL = "http://image.tmdb.org/t/p/";
-    public static String POSTER_SIZE;
-    public static String BACKDROP_SIZE;
+    @BindString(R.string.poster_size) String POSTER_SIZE;
+    @BindString(R.string.backdrop_size) String BACKDROP_SIZE;
 
     int WIDTH;
 
@@ -95,13 +100,8 @@ public class MainActivityFragment extends Fragment {
         setHasOptionsMenu(true);
         con = getActivity();
 
-        POSTER_SIZE = getString(R.string.poster_size);
-        BACKDROP_SIZE = getString(R.string.backdrop_size);
-
         View view = inflater.inflate(R.layout.fragment_main, container, false);
-        gvPosters = (GridView) view.findViewById(R.id.main_gv_posters);
-        pbLoading = (ProgressBar) view.findViewById(R.id.main_pb_loading_network);
-        tvErrorInfo = (TextView) view.findViewById(R.id.main_tv_error_text);
+        ButterKnife.bind(this, view);
 
         adapter = new AdapterPosters(con, null);
         gvPosters.setAdapter(adapter);
