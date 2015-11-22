@@ -1,0 +1,22 @@
+<resources>
+    <string name="app_name">Popular Movies</string>
+    <string name="sort_by">Sort</string>
+    <string name="dialog_sort_title">Sort by</string>
+    <string name="movie_poster">Movie Poster</string>
+
+    <string name="activity_detail_title">Movie detail</string>
+
+    <string name="error_getting_data">Error getting data from internet!</string>
+    <string name="error_server_error">Server error!</string>
+
+    <string name="out_of_ten">/10</string>
+    <string name="votes">votes</string>
+
+    <string name="poster_size">w185</string>
+    <string name="backdrop_size">w342</string>
+
+    <string-array name="sort_by_array">
+        <item>Most popular</item>
+        <item>Highest rated</item>
+    </string-array>
+</resources>
