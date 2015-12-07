@@ -1,4 +1,4 @@
-package com.umang.popularmovies.adapters;
+package com.umang.popularmovies.ui.adapters;
 
 import android.app.Activity;
 import android.content.Context;
@@ -10,8 +10,8 @@ import android.widget.ImageView;
 
 import com.squareup.picasso.Picasso;
 import com.umang.popularmovies.R;
-import com.umang.popularmovies.Utility;
-import com.umang.popularmovies.data.Constants;
+import com.umang.popularmovies.utility.Constants;
+import com.umang.popularmovies.utility.Utility;
 
 import java.io.Serializable;
 import java.util.ArrayList;

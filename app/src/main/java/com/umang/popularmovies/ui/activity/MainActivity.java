@@ -1,17 +1,19 @@
-package com.umang.popularmovies;
+package com.umang.popularmovies.ui.activity;
 
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 
-import com.umang.popularmovies.fragments.MainActivityFragment;
+import com.umang.popularmovies.R;
+import com.umang.popularmovies.ui.fragments.MainActivityFragment;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
 
 public class MainActivity extends AppCompatActivity {
 
-    @Bind(R.id.toolbar) Toolbar toolbar;
+    @Bind(R.id.toolbar)
+    Toolbar toolbar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

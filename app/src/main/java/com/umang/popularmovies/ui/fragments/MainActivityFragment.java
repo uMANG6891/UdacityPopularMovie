@@ -1,4 +1,4 @@
-package com.umang.popularmovies.fragments;
+package com.umang.popularmovies.ui.fragments;
 
 import android.app.AlertDialog;
 import android.content.DialogInterface;
@@ -21,12 +21,12 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.umang.popularmovies.Application;
-import com.umang.popularmovies.DetailActivity;
+import com.umang.popularmovies.ui.activity.DetailActivity;
 import com.umang.popularmovies.R;
-import com.umang.popularmovies.adapters.AdapterPosters;
-import com.umang.popularmovies.data.Constants;
-import com.umang.popularmovies.data.Constants.MOVIE_JSON;
-import com.umang.popularmovies.data.Debug;
+import com.umang.popularmovies.ui.adapters.AdapterPosters;
+import com.umang.popularmovies.utility.Constants;
+import com.umang.popularmovies.utility.Constants.MOVIE_JSON;
+import com.umang.popularmovies.utility.Debug;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -54,9 +54,12 @@ public class MainActivityFragment extends Fragment {
 
     FragmentActivity con;
 
-    @Bind(R.id.main_gv_posters) GridView gvPosters;
-    @Bind(R.id.main_pb_loading_network)  ProgressBar pbLoading;
-    @Bind(R.id.main_tv_error_text) TextView tvErrorInfo;
+    @Bind(R.id.main_gv_posters)
+    GridView gvPosters;
+    @Bind(R.id.main_pb_loading_network)
+    ProgressBar pbLoading;
+    @Bind(R.id.main_tv_error_text)
+    TextView tvErrorInfo;
 
     SharedPreferences.Editor editor;
     AdapterPosters adapter;
@@ -71,8 +74,10 @@ public class MainActivityFragment extends Fragment {
     // movie related urls and image sizes
 
     public static final String BASE_IMAGE_URL = "http://image.tmdb.org/t/p/";
-    @BindString(R.string.poster_size) String POSTER_SIZE;
-    @BindString(R.string.backdrop_size) String BACKDROP_SIZE;
+    @BindString(R.string.poster_size)
+    String POSTER_SIZE;
+    @BindString(R.string.backdrop_size)
+    String BACKDROP_SIZE;
 
     int WIDTH;
 

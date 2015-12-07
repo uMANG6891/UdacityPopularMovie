@@ -1,4 +1,4 @@
-package com.umang.popularmovies;
+package com.umang.popularmovies.ui.activity;
 
 import android.os.Build;
 import android.os.Bundle;
@@ -8,7 +8,8 @@ import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 import android.view.WindowManager;
 
-import com.umang.popularmovies.fragments.DetailActivityFragment;
+import com.umang.popularmovies.R;
+import com.umang.popularmovies.ui.fragments.DetailActivityFragment;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;

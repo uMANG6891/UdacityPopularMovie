@@ -1,4 +1,4 @@
-package com.umang.popularmovies.fragments;
+package com.umang.popularmovies.ui.fragments;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -14,11 +14,11 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.squareup.picasso.Picasso;
-import com.umang.popularmovies.DetailActivity;
+import com.umang.popularmovies.ui.activity.DetailActivity;
 import com.umang.popularmovies.R;
-import com.umang.popularmovies.Utility;
-import com.umang.popularmovies.data.Constants;
-import com.umang.popularmovies.data.Constants.MOVIE_JSON;
+import com.umang.popularmovies.utility.Constants;
+import com.umang.popularmovies.utility.Constants.MOVIE_JSON;
+import com.umang.popularmovies.utility.Utility;
 
 import java.util.HashMap;
 

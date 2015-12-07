@@ -1,10 +1,8 @@
-package com.umang.popularmovies;
+package com.umang.popularmovies.utility;
 
 import android.app.Activity;
 import android.graphics.Point;
 import android.view.Display;
-
-import com.umang.popularmovies.data.Debug;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;

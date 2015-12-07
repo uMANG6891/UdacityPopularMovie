@@ -1,4 +1,4 @@
-package com.umang.popularmovies.data;
+package com.umang.popularmovies.utility;
 
 /**
  * Created by umang on 20/11/15.

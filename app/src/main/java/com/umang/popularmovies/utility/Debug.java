@@ -1,4 +1,4 @@
-package com.umang.popularmovies.data;
+package com.umang.popularmovies.utility;
 
 import android.util.Log;
 
