@@ -5,5 +5,8 @@
     <color name="colorAccent">#FFC107</color>
     <color name="colorAccentDark">#FFA000</color>
 
-    <color name="background_color">#303030</color>
+    <color name="horizontal_line_separator">#AAA</color>
+
+    <color name="window_background">#EEE</color>
+    <color name="transparent">#00000000</color>
 </resources>

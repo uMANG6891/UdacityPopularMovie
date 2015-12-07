@@ -9,8 +9,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.squareup.picasso.Picasso;
@@ -46,8 +44,6 @@ public class DetailActivityFragment extends Fragment {
     TextView tvRating;
     @Bind(R.id.frag_d_tv_overview)
     TextView tvOverview;
-    @Bind(R.id.frag_d_rl_poster_layout)RelativeLayout rlPoster;
-    @Bind(R.id.frag_d_first_element)LinearLayout firstViewInScrollBar;
 
     @Nullable
     @Override
@@ -61,7 +57,6 @@ public class DetailActivityFragment extends Fragment {
 
         int width = Utility.getScreenWidth(con);
         int height = (int) (width * Constants.MOVIE_BACKDROP_MULTIPLIER);
-        rlPoster.setLayoutParams(new LinearLayout.LayoutParams(width, height));
 
 
         Intent intent = con.getIntent();
@@ -74,7 +69,7 @@ public class DetailActivityFragment extends Fragment {
             tvVotes.setText(row.get(MOVIE_JSON.VOTE_COUNT) + " ");
             tvRating.setText(row.get(MOVIE_JSON.VOTE_AVERAGE));
             tvOverview.setText(row.get(MOVIE_JSON.OVERVIEW));
-            ((DetailActivity) con).setActionBarTitle(row.get(MOVIE_JSON.TITLE)); // setting the title in the toolbar
+//            ((DetailActivity) con).setActionBarTitle(row.get(MOVIE_JSON.TITLE)); // setting the title in the toolbar
         }
 
         return view;

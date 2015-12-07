@@ -9,6 +9,8 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
+import android.support.v7.widget.GridLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -16,7 +18,6 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
-import android.widget.GridView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
@@ -37,8 +38,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
-import java.net.ProtocolException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -54,8 +53,8 @@ public class MainActivityFragment extends Fragment {
 
     FragmentActivity con;
 
-    @Bind(R.id.main_gv_posters)
-    GridView gvPosters;
+    @Bind(R.id.main_rv_posters)
+    RecyclerView rvPosters;
     @Bind(R.id.main_pb_loading_network)
     ProgressBar pbLoading;
     @Bind(R.id.main_tv_error_text)
@@ -72,18 +71,16 @@ public class MainActivityFragment extends Fragment {
     private boolean loadData = false;
 
     // movie related urls and image sizes
-
     public static final String BASE_IMAGE_URL = "http://image.tmdb.org/t/p/";
-    @BindString(R.string.poster_size)
     String POSTER_SIZE;
-    @BindString(R.string.backdrop_size)
     String BACKDROP_SIZE;
 
-    int WIDTH;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        POSTER_SIZE = getString(R.string.poster_size);
+        BACKDROP_SIZE = getString(R.string.backdrop_size);
         if (savedInstanceState == null || !savedInstanceState.containsKey(KEY_SAVE_JSON_STRING)) {
             loadData = true;
         } else {
@@ -109,15 +106,8 @@ public class MainActivityFragment extends Fragment {
         ButterKnife.bind(this, view);
 
         adapter = new AdapterPosters(con, null);
-        gvPosters.setAdapter(adapter);
-        gvPosters.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                Intent i = new Intent(con, DetailActivity.class);
-                i.putExtra(DetailActivity.EXTRA_MOVIE_DATA, adapter.getOneMovieData(position));
-                startActivity(i);
-            }
-        });
+        rvPosters.setLayoutManager(new GridLayoutManager(con, con.getResources().getInteger(R.integer.main_grid_columns)));
+        rvPosters.setAdapter(adapter);
         if (loadData) {
             loadMovieData();
             showLoading();
@@ -291,10 +281,6 @@ public class MainActivityFragment extends Fragment {
                 }
                 moviesJson = buffer.toString();
                 return moviesJson;
-            } catch (MalformedURLException e) {
-                e.printStackTrace();
-            } catch (ProtocolException e) {
-                e.printStackTrace();
             } catch (IOException e) {
                 e.printStackTrace();
             } finally {

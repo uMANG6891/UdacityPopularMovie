@@ -20,24 +20,17 @@ import butterknife.ButterKnife;
 public class DetailActivity extends AppCompatActivity {
 
     public static final String EXTRA_MOVIE_DATA = "extra_movie_data";
-    @Bind(R.id.toolbar) Toolbar toolbar;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_detail);
         ButterKnife.bind(this);
-        setSupportActionBar(toolbar);
 
         ActionBar actionbar = getSupportActionBar();
         if (actionbar != null) {
             actionbar.setDisplayShowHomeEnabled(true);
             actionbar.setDisplayHomeAsUpEnabled(true);
-            actionbar.setTitle(getString(R.string.activity_detail_title));
-        }
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            getWindow().addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
-                getWindow().setStatusBarColor(getColor(R.color.colorPrimaryDark));
         }
 
         if (savedInstanceState == null) {
@@ -47,9 +40,8 @@ public class DetailActivity extends AppCompatActivity {
                     .commit();
         }
     }
-    public void setActionBarTitle(String title){
-        getSupportActionBar().setTitle(title);
-    }
+
+
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         super.onOptionsItemSelected(item);

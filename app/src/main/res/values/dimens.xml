@@ -1,10 +1,21 @@
 <resources>
     <!-- Default screen margins, per the Android Design guidelines. -->
-    <dimen name="activity_horizontal_margin">16dp</dimen>
+    <dimen name="activity_horizontal_margin">8dp</dimen>
     <dimen name="activity_vertical_margin">16dp</dimen>
     <dimen name="fab_margin">16dp</dimen>
     <dimen name="toolbar_elevation">2dp</dimen>
-    <dimen name="textAppearanceExtraLarge">40sp</dimen>
+
+    <dimen name="translucent_toolbar_padding_top">0dp</dimen>
+
+    <!-- Poster size-->
+    <dimen name="poster_width">185dp</dimen>
+    <dimen name="poster_height">278dp</dimen>
+    <dimen name="poster_small_width">139dp</dimen>
+    <dimen name="poster_small_height">210dp</dimen>
+    <!-- Backdrop size-->
+    <dimen name="backdrop_width">342dp</dimen>
+    <dimen name="backdrop_height">192dp</dimen>
+    <dimen name="backdrop_height_below_layout">176dp</dimen>
 
     <!--integer values-->
     <integer name="main_grid_columns">2</integer>

@@ -14,6 +14,8 @@
 
     <string name="poster_size">w185</string>
     <string name="backdrop_size">w342</string>
+    <string name="out_of_name">/10</string>
+    <string name="read_more">READ MORE</string>
 
     <string-array name="sort_by_array">
         <item>Most popular</item>
