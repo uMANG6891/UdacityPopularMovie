@@ -1,5 +1,7 @@
 package com.umang.popularmovies.utility;
 
+import com.umang.popularmovies.data.MovieContract.MovieEntry;
+
 /**
  * Created by umang on 20/11/15.
  */
@@ -31,4 +33,33 @@ public class Constants {
         public static final String VOTE_COUNT = "vote_count";
     }
 
+    public static final String[] MOVIE_PROJECTION_COLS = {
+            MovieEntry.TABLE_NAME + "." + MovieEntry._ID,
+            MovieEntry.COLUMN_MOVIE_ID,
+            MovieEntry.COLUMN_SAVED_FOR,
+            MovieEntry.COLUMN_TITLE,
+            MovieEntry.COLUMN_OVERVIEW,
+            MovieEntry.COLUMN_POSTER_PATH,
+            MovieEntry.COLUMN_BACKDROP_PATH,
+            MovieEntry.COLUMN_RELEASE_DATE,
+            MovieEntry.COLUMN_VOTE_AVERAGE,
+            MovieEntry.COLUMN_VOTE_COUNT,
+            MovieEntry.COLUMN_CAST,
+            MovieEntry.COLUMN_VIDEO_LINK,
+            MovieEntry.COLUMN_REVIEWS
+    };
+
+    public static final int RV_COL_ID = 0;
+    public static final int RV_COL_MOVIE_ID = 1;
+    public static final int RV_COL_SAVED_FOR = 2;
+    public static final int RV_COL_TITLE = 3;
+    public static final int RV_COL_OVERVIEW = 4;
+    public static final int RV_COL_POSTER_PATH = 5;
+    public static final int RV_COL_BACKDROP_PATH = 6;
+    public static final int RV_COL_RELEASE_DATE = 7;
+    public static final int RV_COL_VOTE_AVERAGE = 8;
+    public static final int RV_COL_VOTE_COUNT = 9;
+    public static final int RV_COL_CAST = 10;
+    public static final int RV_COL_VIDEO_LINK = 11;
+    public static final int RV_COL_REVIEWS = 12;
 }

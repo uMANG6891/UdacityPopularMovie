@@ -8,6 +8,8 @@ import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
 import android.support.annotation.Nullable;
 
+import com.umang.popularmovies.utility.Debug;
+
 /**
  * Created by umang on 08/12/15.
  */
@@ -84,7 +86,8 @@ public class MovieProvider extends ContentProvider {
             default:
                 throw new UnsupportedOperationException("Unknown uri: " + uri);
         }
-        retCursor.setNotificationUri(getContext().getContentResolver(), uri);
+        if (getContext() != null)
+            retCursor.setNotificationUri(getContext().getContentResolver(), uri);
         return retCursor;
     }
 

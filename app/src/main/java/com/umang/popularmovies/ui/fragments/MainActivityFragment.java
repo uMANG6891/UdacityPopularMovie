@@ -27,6 +27,7 @@ import android.widget.TextView;
 import com.umang.popularmovies.Application;
 import com.umang.popularmovies.R;
 import com.umang.popularmovies.data.MovieContract.MovieEntry;
+import com.umang.popularmovies.sync.MovieSyncAdapter;
 import com.umang.popularmovies.ui.adapters.AdapterPosters;
 import com.umang.popularmovies.utility.Constants;
 import com.umang.popularmovies.utility.Constants.MOVIE_JSON;
@@ -66,41 +67,9 @@ public class MainActivityFragment extends Fragment implements LoaderManager.Load
     SharedPreferences.Editor editor;
     AdapterPosters adapter;
 
-    // for savedInstance
-    JSONArray JSON_DATA_FOR_SAVED_INSTANCE;
-    ArrayList<HashMap<String, String>> MOVIE_DATA;
-    private final String KEY_SAVE_JSON_STRING = "key_save_json_string";
-
-    private boolean loadData = false;
-
-    // movie related urls and image sizes
-    public static final String BASE_IMAGE_URL = "http://image.tmdb.org/t/p/";
-    String POSTER_SIZE;
-    String BACKDROP_SIZE;
-
 
     private static final int LOADER_MOVIES = 0;
 
-
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        POSTER_SIZE = getString(R.string.poster_size);
-        BACKDROP_SIZE = getString(R.string.backdrop_size);
-        if (savedInstanceState == null || !savedInstanceState.containsKey(KEY_SAVE_JSON_STRING)) {
-            loadData = true;
-        } else {
-            MOVIE_DATA = convertToArrayList(savedInstanceState.getString(KEY_SAVE_JSON_STRING));
-        }
-    }
-
-    @Override
-    public void onSaveInstanceState(Bundle outState) {
-        if (JSON_DATA_FOR_SAVED_INSTANCE != null) {
-            outState.putString(KEY_SAVE_JSON_STRING, JSON_DATA_FOR_SAVED_INSTANCE.toString());
-        }
-        super.onSaveInstanceState(outState);
-    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -114,28 +83,18 @@ public class MainActivityFragment extends Fragment implements LoaderManager.Load
         adapter = new AdapterPosters(con, null);
         rvPosters.setLayoutManager(new GridLayoutManager(con, con.getResources().getInteger(R.integer.main_grid_columns)));
         rvPosters.setAdapter(adapter);
-        if (loadData) {
-            loadMovieData();
-            showLoading();
-        } else {
-            setAdapterWithData();
-            hideLoading();
-        }
-        getLoaderManager().initLoader(LOADER_MOVIES, null, this);
+        loadMovieData();
+        showLoading();
+
+        String[] sortItems = getResources().getStringArray(R.array.sort_by_array);
+        con.setTitle(sortItems[Application.sp.getInt(Constants.SP_SORT_BY, 0)]);
         return view;
     }
 
     private void loadMovieData() {
         adapter.changeBase(null);
-        adapter.notifyDataSetChanged();
-        FetchMoviesData fetchMoviesData = new FetchMoviesData();
-        fetchMoviesData.execute(FetchMoviesData.GET_POPULAR_MOVIES);
+        getLoaderManager().initLoader(LOADER_MOVIES, null, this);
         showLoading();
-    }
-
-    private void setAdapterWithData() {
-        adapter.changeBase(MOVIE_DATA);
-        adapter.notifyDataSetChanged();
     }
 
     private void showLoading() {
@@ -163,7 +122,7 @@ public class MainActivityFragment extends Fragment implements LoaderManager.Load
         super.onOptionsItemSelected(item);
         switch (item.getItemId()) {
             case R.id.menu_action_sort:
-                String[] sortItems = getResources().getStringArray(R.array.sort_by_array);
+                final String[] sortItems = getResources().getStringArray(R.array.sort_by_array);
                 AlertDialog.Builder builder = new AlertDialog.Builder(con);
                 builder.setTitle(getString(R.string.dialog_sort_title))
                         .setSingleChoiceItems(sortItems, Application.sp.getInt(Constants.SP_SORT_BY, 0), new DialogInterface.OnClickListener() {
@@ -173,7 +132,9 @@ public class MainActivityFragment extends Fragment implements LoaderManager.Load
                                 editor.putInt(Constants.SP_SORT_BY, which);
                                 editor.apply();
                                 dialog.dismiss();
-                                loadMovieData();
+                                con.setTitle(sortItems[which]);
+                                getLoaderManager().restartLoader(LOADER_MOVIES, null, MainActivityFragment.this);
+                                showLoading();
                             }
                         });
                 builder.create().show();
@@ -189,9 +150,9 @@ public class MainActivityFragment extends Fragment implements LoaderManager.Load
             case LOADER_MOVIES:
                 return new CursorLoader(
                         con,
-                        MovieEntry.CONTENT_URI,
+                        MovieEntry.buildMovieForSavedForUri(Application.sp.getInt(Constants.SP_SORT_BY, 0)),
                         null,
-                        null,
+                        MovieEntry.COLUMN_SAVED_FOR + " = ?",
                         null,
                         null
                 );
@@ -202,190 +163,24 @@ public class MainActivityFragment extends Fragment implements LoaderManager.Load
 
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
-
+        switch (loader.getId()) {
+            case LOADER_MOVIES:
+                hideLoading();
+                if (data.getCount() == 0) {
+                    MovieSyncAdapter.syncImmediately(getActivity());
+                    showErrorText(getString(R.string.error_getting_data));
+                } else {
+                    showErrorText("");
+                    adapter.changeBase(data);
+                }
+            default:
+                break;
+        }
     }
 
     @Override
     public void onLoaderReset(Loader<Cursor> loader) {
 
-    }
-
-
-    public class FetchMoviesData extends AsyncTask<Integer, Void, String> {
-
-        public static final int GET_POPULAR_MOVIES = 0;
-
-        public String API_KEY = Constants.MOVIE_DB_API_KEY;
-        public String MOVIE_URL = "http://api.themoviedb.org/3/discover/movie?sort_by="
-                + Constants.MOVIE_URL[Application.sp.getInt(Constants.SP_SORT_BY, 0)]
-                + "&api_key=" + API_KEY;
-
-        private final String LOG_TAG = FetchMoviesData.class.getSimpleName();
-
-        @Override
-        protected String doInBackground(Integer... params) {
-            switch (params[0]) {
-                case GET_POPULAR_MOVIES:
-                    return getPopularMoviesFromServer(MOVIE_URL);
-                default:
-                    return null;
-            }
-        }
-
-        @Override
-        protected void onPostExecute(String s) {
-            super.onPostExecute(s);
-            hideLoading();
-            if (s == null) {
-                showErrorText(getString(R.string.error_getting_data));
-            } else {
-                if (checkIfResultExists(s)) {
-                    s = getResultJsonArrayString(s);
-                    MOVIE_DATA = convertToArrayList(s);
-                    setAdapterWithData();
-                } else {
-                    showErrorText(getString(R.string.error_server_error));
-                }
-            }
-        }
-
-        private String getResultJsonArrayString(String s) {
-            JSONObject joData;
-            JSONArray jaMovies = new JSONArray();
-            try {
-                joData = new JSONObject(s);
-                jaMovies = new JSONArray(joData.getString(MOVIE_JSON.JSON_RESULT));
-
-                Vector<ContentValues> cVVector = new Vector<>(jaMovies.length());
-
-                for (int i = 0; i < jaMovies.length(); i++) {
-                    joData = jaMovies.getJSONObject(i);
-                    ContentValues weatherValues = new ContentValues();
-                    weatherValues.put(MovieEntry.COLUMN_MOVIE_ID, joData.getString(MOVIE_JSON.ID));
-                    weatherValues.put(MovieEntry.COLUMN_SAVED_FOR, Application.sp.getInt(Constants.SP_SORT_BY, 0));
-                    weatherValues.put(MovieEntry.COLUMN_TITLE, joData.getString(MOVIE_JSON.TITLE));
-                    weatherValues.put(MovieEntry.COLUMN_OVERVIEW, joData.getString(MOVIE_JSON.OVERVIEW));
-                    weatherValues.put(MovieEntry.COLUMN_POSTER_PATH, joData.getString(MOVIE_JSON.POSTER));
-                    weatherValues.put(MovieEntry.COLUMN_BACKDROP_PATH, joData.getString(MOVIE_JSON.BACKDROP));
-                    weatherValues.put(MovieEntry.COLUMN_RELEASE_DATE, joData.getString(MOVIE_JSON.RELEASE_DATE));
-                    weatherValues.put(MovieEntry.COLUMN_VOTE_AVERAGE, joData.getString(MOVIE_JSON.VOTE_AVERAGE));
-                    weatherValues.put(MovieEntry.COLUMN_VOTE_COUNT, joData.getString(MOVIE_JSON.VOTE_COUNT));
-//                    weatherValues.put(MovieEntry.COLUMN_CAST, weatherId);
-//                    weatherValues.put(MovieEntry.COLUMN_VIDEO_LINK, weatherId);
-//                    weatherValues.put(MovieEntry.COLUMN_REVIEWS, weatherId);
-                    cVVector.add(weatherValues);
-                }
-                if (cVVector.size() > 0) {
-                    ContentValues[] cvArray = new ContentValues[cVVector.size()];
-                    cVVector.toArray(cvArray);
-                    con.getContentResolver().delete(MovieEntry.CONTENT_URI,
-                            MovieEntry.COLUMN_SAVED_FOR + " = ?",
-                            new String[]{String.valueOf(Application.sp.getInt(Constants.SP_SORT_BY, 0))});
-                    con.getContentResolver().bulkInsert(MovieEntry.CONTENT_URI, cvArray);
-                }
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
-            return jaMovies.toString();
-        }
-
-        private boolean checkIfResultExists(String s) {
-            JSONObject joData = null;
-            try {
-                joData = new JSONObject(s);
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
-            return joData != null && joData.has(MOVIE_JSON.JSON_RESULT);
-        }
-
-
-        private String getPopularMoviesFromServer(String inputUrl) {
-            if (inputUrl == null || inputUrl.length() == 0) {
-                return null;
-            }
-
-            HttpURLConnection urlConnection = null;
-            BufferedReader reader = null;
-
-            String moviesJson = null;
-
-
-            try {
-                Uri builtUri = Uri.parse(inputUrl);
-
-                URL url = new URL(builtUri.toString());
-
-                // Create the request to OpenWeatherMap, and open the connection
-                urlConnection = (HttpURLConnection) url.openConnection();
-                urlConnection.setRequestMethod("GET");
-                urlConnection.connect();
-
-                // Read the input stream into a String
-                InputStream inputStream = urlConnection.getInputStream();
-                StringBuffer buffer = new StringBuffer();
-                if (inputStream == null) {
-                    // Nothing to do.
-                    return null;
-                }
-                reader = new BufferedReader(new InputStreamReader(inputStream));
-
-                String line;
-                while ((line = reader.readLine()) != null) {
-                    // Since it's JSON, adding a newline isn't necessary (it won't affect parsing)
-                    // But it does make debugging a *lot* easier if you print out the completed
-                    // buffer for debugging.
-                    buffer.append(line + "\n");
-                }
-
-                if (buffer.length() == 0) {
-                    // Stream was empty.  No point in parsing.
-                    return null;
-                }
-                moviesJson = buffer.toString();
-                return moviesJson;
-            } catch (IOException e) {
-                e.printStackTrace();
-            } finally {
-                if (urlConnection != null) {
-                    urlConnection.disconnect();
-                }
-                if (reader != null) {
-                    try {
-                        reader.close();
-                    } catch (final IOException e) {
-                        Debug.e(LOG_TAG, "Error closing stream");
-                    }
-                }
-            }
-            // This will only happen if there was an error getting or parsing the forecast.
-            return null;
-        }
-    }
-
-    private ArrayList<HashMap<String, String>> convertToArrayList(String s) {
-        JSONObject joData;
-        try {
-            JSON_DATA_FOR_SAVED_INSTANCE = new JSONArray(s);
-            HashMap<String, String> row;
-            MOVIE_DATA = new ArrayList<>();
-            for (int i = 0; i < JSON_DATA_FOR_SAVED_INSTANCE.length(); i++) {
-                joData = new JSONObject(JSON_DATA_FOR_SAVED_INSTANCE.get(i).toString());
-                row = new HashMap<>();
-                row.put(MOVIE_JSON.BACKDROP, BASE_IMAGE_URL + BACKDROP_SIZE + joData.getString(MOVIE_JSON.BACKDROP));
-                row.put(MOVIE_JSON.POSTER, BASE_IMAGE_URL + POSTER_SIZE + joData.getString(MOVIE_JSON.POSTER));
-                row.put(MOVIE_JSON.ID, joData.getString(MOVIE_JSON.ID));
-                row.put(MOVIE_JSON.TITLE, joData.getString(MOVIE_JSON.TITLE));
-                row.put(MOVIE_JSON.OVERVIEW, joData.getString(MOVIE_JSON.OVERVIEW));
-                row.put(MOVIE_JSON.RELEASE_DATE, joData.getString(MOVIE_JSON.RELEASE_DATE));
-                row.put(MOVIE_JSON.VOTE_AVERAGE, joData.getString(MOVIE_JSON.VOTE_AVERAGE));
-                row.put(MOVIE_JSON.VOTE_COUNT, joData.getString(MOVIE_JSON.VOTE_COUNT));
-                MOVIE_DATA.add(row);
-            }
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-        return MOVIE_DATA;
     }
 
 

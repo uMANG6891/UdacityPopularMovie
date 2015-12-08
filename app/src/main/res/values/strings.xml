@@ -6,6 +6,7 @@
 
     <string name="activity_detail_title">Movie detail</string>
 
+    <string name="error_no_movies_found">No movies found</string>
     <string name="error_getting_data">Error getting data from internet!</string>
     <string name="error_server_error">Server error!</string>
 
@@ -21,4 +22,9 @@
         <item>Most popular</item>
         <item>Highest rated</item>
     </string-array>
+
+
+    <!-- SyncAdapter related -->
+    <string name="sync_account_type">com.umang.popuparmovies</string>
+    <string name="content_authority">com.umang.popularmovies</string>
 </resources>

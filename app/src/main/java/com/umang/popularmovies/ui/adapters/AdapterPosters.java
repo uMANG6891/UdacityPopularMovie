@@ -3,6 +3,7 @@ package com.umang.popularmovies.ui.adapters;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.database.Cursor;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -14,6 +15,7 @@ import android.widget.TextView;
 import com.squareup.picasso.Picasso;
 import com.umang.popularmovies.R;
 import com.umang.popularmovies.ui.activity.DetailActivity;
+import com.umang.popularmovies.utility.Constants;
 import com.umang.popularmovies.utility.Constants.MOVIE_JSON;
 
 import java.io.Serializable;
@@ -30,11 +32,18 @@ public class AdapterPosters extends RecyclerView.Adapter<AdapterPosters.VH> {
 
 
     Context con;
-    ArrayList<HashMap<String, String>> MOVIE_DATA;
+    Cursor MOVIE_DATA;
 
-    public AdapterPosters(Activity con, ArrayList<HashMap<String, String>> data) {
+    // movie related urls and image sizes
+    public static final String BASE_IMAGE_URL = "http://image.tmdb.org/t/p/";
+    String POSTER_SIZE;
+    String BACKDROP_SIZE;
+
+    public AdapterPosters(Activity con, Cursor data) {
         this.con = con;
         this.MOVIE_DATA = data;
+        POSTER_SIZE = con.getString(R.string.poster_size);
+        BACKDROP_SIZE = con.getString(R.string.backdrop_size);
     }
 
     @Override
@@ -45,26 +54,27 @@ public class AdapterPosters extends RecyclerView.Adapter<AdapterPosters.VH> {
 
     @Override
     public void onBindViewHolder(VH holder, int position) {
-        HashMap<String, String> row = MOVIE_DATA.get(position);
-        holder.tvMovieName.setText(row.get(MOVIE_JSON.TITLE));
-        holder.tvMovieRating.setText(row.get(MOVIE_JSON.VOTE_AVERAGE));
+        MOVIE_DATA.moveToPosition(position);
+        holder.tvMovieName.setText(MOVIE_DATA.getString(Constants.RV_COL_TITLE));
+        holder.tvMovieRating.setText(MOVIE_DATA.getString(Constants.RV_COL_VOTE_AVERAGE));
         Picasso.with(con)
-                .load(row.get(MOVIE_JSON.POSTER))
+                .load(BASE_IMAGE_URL + BACKDROP_SIZE + MOVIE_DATA.getString(Constants.RV_COL_POSTER_PATH))
                 .into(holder.ivPoster);
     }
 
     @Override
     public int getItemCount() {
-        return MOVIE_DATA == null ? 0 : MOVIE_DATA.size();
+        return MOVIE_DATA == null ? 0 : MOVIE_DATA.getCount();
     }
 
 
-    public void changeBase(ArrayList<HashMap<String, String>> data) {
+    public void changeBase(Cursor data) {
         MOVIE_DATA = data;
+        notifyDataSetChanged();
     }
 
     public Serializable getOneMovieData(int position) {
-        HashMap<String, String> row = MOVIE_DATA.get(position);
+        HashMap<String, String> row = new HashMap<>();
         return row;
     }
 
