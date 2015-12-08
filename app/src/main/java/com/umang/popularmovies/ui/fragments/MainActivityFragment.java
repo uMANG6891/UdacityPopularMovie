@@ -1,14 +1,18 @@
 package com.umang.popularmovies.ui.fragments;
 
 import android.app.AlertDialog;
+import android.content.ContentValues;
 import android.content.DialogInterface;
-import android.content.Intent;
 import android.content.SharedPreferences;
+import android.database.Cursor;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
+import android.support.v4.app.LoaderManager;
+import android.support.v4.content.CursorLoader;
+import android.support.v4.content.Loader;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -17,13 +21,12 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.umang.popularmovies.Application;
-import com.umang.popularmovies.ui.activity.DetailActivity;
 import com.umang.popularmovies.R;
+import com.umang.popularmovies.data.MovieContract.MovieEntry;
 import com.umang.popularmovies.ui.adapters.AdapterPosters;
 import com.umang.popularmovies.utility.Constants;
 import com.umang.popularmovies.utility.Constants.MOVIE_JSON;
@@ -41,15 +44,15 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Vector;
 
 import butterknife.Bind;
-import butterknife.BindString;
 import butterknife.ButterKnife;
 
 /**
  * A placeholder fragment containing a simple view.
  */
-public class MainActivityFragment extends Fragment {
+public class MainActivityFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
 
     FragmentActivity con;
 
@@ -74,6 +77,9 @@ public class MainActivityFragment extends Fragment {
     public static final String BASE_IMAGE_URL = "http://image.tmdb.org/t/p/";
     String POSTER_SIZE;
     String BACKDROP_SIZE;
+
+
+    private static final int LOADER_MOVIES = 0;
 
 
     @Override
@@ -115,6 +121,7 @@ public class MainActivityFragment extends Fragment {
             setAdapterWithData();
             hideLoading();
         }
+        getLoaderManager().initLoader(LOADER_MOVIES, null, this);
         return view;
     }
 
@@ -176,6 +183,34 @@ public class MainActivityFragment extends Fragment {
         }
     }
 
+    @Override
+    public Loader<Cursor> onCreateLoader(int id, Bundle args) {
+        switch (id) {
+            case LOADER_MOVIES:
+                return new CursorLoader(
+                        con,
+                        MovieEntry.CONTENT_URI,
+                        null,
+                        null,
+                        null,
+                        null
+                );
+            default:
+                return null;
+        }
+    }
+
+    @Override
+    public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
+
+    }
+
+    @Override
+    public void onLoaderReset(Loader<Cursor> loader) {
+
+    }
+
+
     public class FetchMoviesData extends AsyncTask<Integer, Void, String> {
 
         public static final int GET_POPULAR_MOVIES = 0;
@@ -215,11 +250,39 @@ public class MainActivityFragment extends Fragment {
         }
 
         private String getResultJsonArrayString(String s) {
-            JSONObject joData = null;
+            JSONObject joData;
             JSONArray jaMovies = new JSONArray();
             try {
                 joData = new JSONObject(s);
                 jaMovies = new JSONArray(joData.getString(MOVIE_JSON.JSON_RESULT));
+
+                Vector<ContentValues> cVVector = new Vector<>(jaMovies.length());
+
+                for (int i = 0; i < jaMovies.length(); i++) {
+                    joData = jaMovies.getJSONObject(i);
+                    ContentValues weatherValues = new ContentValues();
+                    weatherValues.put(MovieEntry.COLUMN_MOVIE_ID, joData.getString(MOVIE_JSON.ID));
+                    weatherValues.put(MovieEntry.COLUMN_SAVED_FOR, Application.sp.getInt(Constants.SP_SORT_BY, 0));
+                    weatherValues.put(MovieEntry.COLUMN_TITLE, joData.getString(MOVIE_JSON.TITLE));
+                    weatherValues.put(MovieEntry.COLUMN_OVERVIEW, joData.getString(MOVIE_JSON.OVERVIEW));
+                    weatherValues.put(MovieEntry.COLUMN_POSTER_PATH, joData.getString(MOVIE_JSON.POSTER));
+                    weatherValues.put(MovieEntry.COLUMN_BACKDROP_PATH, joData.getString(MOVIE_JSON.BACKDROP));
+                    weatherValues.put(MovieEntry.COLUMN_RELEASE_DATE, joData.getString(MOVIE_JSON.RELEASE_DATE));
+                    weatherValues.put(MovieEntry.COLUMN_VOTE_AVERAGE, joData.getString(MOVIE_JSON.VOTE_AVERAGE));
+                    weatherValues.put(MovieEntry.COLUMN_VOTE_COUNT, joData.getString(MOVIE_JSON.VOTE_COUNT));
+//                    weatherValues.put(MovieEntry.COLUMN_CAST, weatherId);
+//                    weatherValues.put(MovieEntry.COLUMN_VIDEO_LINK, weatherId);
+//                    weatherValues.put(MovieEntry.COLUMN_REVIEWS, weatherId);
+                    cVVector.add(weatherValues);
+                }
+                if (cVVector.size() > 0) {
+                    ContentValues[] cvArray = new ContentValues[cVVector.size()];
+                    cVVector.toArray(cvArray);
+                    con.getContentResolver().delete(MovieEntry.CONTENT_URI,
+                            MovieEntry.COLUMN_SAVED_FOR + " = ?",
+                            new String[]{String.valueOf(Application.sp.getInt(Constants.SP_SORT_BY, 0))});
+                    con.getContentResolver().bulkInsert(MovieEntry.CONTENT_URI, cvArray);
+                }
             } catch (JSONException e) {
                 e.printStackTrace();
             }
