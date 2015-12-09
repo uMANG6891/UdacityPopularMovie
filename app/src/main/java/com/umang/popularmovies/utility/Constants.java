@@ -8,9 +8,15 @@ import com.umang.popularmovies.data.MovieContract.MovieEntry;
 public class Constants {
     public static final String MOVIE_DB_API_KEY = "YOUR_MOVIEDB_API_KEY"; // Enter your themoviedb api key here
 
+    public static final String BASE_MOVIE_DB_URL = "http://api.themoviedb.org/3/";
+    public static final String BASE_IMAGE_URL = "http://image.tmdb.org/t/p/";
+
     public static final double MOVIE_POSTER_MULTIPLIER = 1.5;
     public static final double MOVIE_BACKDROP_MULTIPLIER = 0.5617977528089888; // ~( 1/1.78)
     public static final String SP_SORT_BY = "sp_sort_by";
+
+    public static String POSTER_SIZE;
+    public static String BACKDROP_SIZE;
 
     public static String[] MOVIE_URL = new String[]{
             "popularity.desc",
@@ -33,21 +39,21 @@ public class Constants {
         public static final String VOTE_COUNT = "vote_count";
     }
 
-    public static final String[] MOVIE_PROJECTION_COLS = {
-            MovieEntry.TABLE_NAME + "." + MovieEntry._ID,
-            MovieEntry.COLUMN_MOVIE_ID,
-            MovieEntry.COLUMN_SAVED_FOR,
-            MovieEntry.COLUMN_TITLE,
-            MovieEntry.COLUMN_OVERVIEW,
-            MovieEntry.COLUMN_POSTER_PATH,
-            MovieEntry.COLUMN_BACKDROP_PATH,
-            MovieEntry.COLUMN_RELEASE_DATE,
-            MovieEntry.COLUMN_VOTE_AVERAGE,
-            MovieEntry.COLUMN_VOTE_COUNT,
-            MovieEntry.COLUMN_CAST,
-            MovieEntry.COLUMN_VIDEO_LINK,
-            MovieEntry.COLUMN_REVIEWS
-    };
+//    public static final String[] MOVIE_PROJECTION_COLS = {
+//            MovieEntry.TABLE_NAME + "." + MovieEntry._ID,
+//            MovieEntry.COLUMN_MOVIE_ID,
+//            MovieEntry.COLUMN_SAVED_FOR,
+//            MovieEntry.COLUMN_TITLE,
+//            MovieEntry.COLUMN_OVERVIEW,
+//            MovieEntry.COLUMN_POSTER_PATH,
+//            MovieEntry.COLUMN_BACKDROP_PATH,
+//            MovieEntry.COLUMN_RELEASE_DATE,
+//            MovieEntry.COLUMN_VOTE_AVERAGE,
+//            MovieEntry.COLUMN_VOTE_COUNT,
+//            MovieEntry.COLUMN_CAST,
+//            MovieEntry.COLUMN_VIDEO_LINK,
+//            MovieEntry.COLUMN_REVIEWS
+//    };
 
     public static final int RV_COL_ID = 0;
     public static final int RV_COL_MOVIE_ID = 1;

@@ -9,26 +9,19 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.content.SyncRequest;
 import android.content.SyncResult;
-import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 
 import com.umang.popularmovies.Application;
 import com.umang.popularmovies.R;
+import com.umang.popularmovies.data.FetchAsyncData;
 import com.umang.popularmovies.data.MovieContract.MovieEntry;
 import com.umang.popularmovies.utility.Constants;
-import com.umang.popularmovies.utility.Debug;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.net.HttpURLConnection;
-import java.net.URL;
 import java.util.Vector;
 
 /**
@@ -36,7 +29,6 @@ import java.util.Vector;
  */
 public class MovieSyncAdapter extends AbstractThreadedSyncAdapter {
 
-    public final String LOG_TAG = MovieSyncAdapter.class.getSimpleName();
     // Interval at which to sync with the weather, in seconds. => 24 hours
     public static final int SYNC_INTERVAL = 60 * 60 * 24;
     public static final int SYNC_FLEXTIME = SYNC_INTERVAL / 3;
@@ -51,58 +43,16 @@ public class MovieSyncAdapter extends AbstractThreadedSyncAdapter {
     public void onPerformSync(Account account, Bundle extras, String authority, ContentProviderClient provider, SyncResult syncResult) {
 
         String API_KEY = Constants.MOVIE_DB_API_KEY;
-        String MOVIE_URL = "http://api.themoviedb.org/3/discover/movie?sort_by="
+        String MOVIE_URL = Constants.BASE_MOVIE_DB_URL + "discover/movie?sort_by="
                 + Constants.MOVIE_URL[Application.sp.getInt(Constants.SP_SORT_BY, 0)]
                 + "&api_key=" + API_KEY;
 
-        HttpURLConnection urlConnection = null;
-        BufferedReader reader = null;
-
-        String moviesJson = null;
-
-        try {
-            Uri builtUri = Uri.parse(MOVIE_URL);
-
-            URL url = new URL(builtUri.toString());
-
-            urlConnection = (HttpURLConnection) url.openConnection();
-            urlConnection.setRequestMethod("GET");
-            urlConnection.connect();
-
-            InputStream inputStream = urlConnection.getInputStream();
-            StringBuffer buffer = new StringBuffer();
-            if (inputStream == null) {
-                return;
-            }
-            reader = new BufferedReader(new InputStreamReader(inputStream));
-
-            String line;
-            while ((line = reader.readLine()) != null) {
-                buffer.append(line + "\n");
-            }
-
-            if (buffer.length() == 0) {
-                return;
-            }
-            moviesJson = buffer.toString();
-            if (checkIfResultExists(moviesJson)) {
-                saveMovies(moviesJson);
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        } finally {
-            if (urlConnection != null) {
-                urlConnection.disconnect();
-            }
-            if (reader != null) {
-                try {
-                    reader.close();
-                } catch (final IOException e) {
-                    Debug.e(LOG_TAG, "Error closing stream");
-                }
-            }
+        String movies = FetchAsyncData.getFromInternet(MOVIE_URL);
+        if (movies != null && checkIfResultExists(movies)) {
+            saveMovies(movies);
         }
     }
+
 
     private void saveMovies(String s) {
         try {
@@ -113,20 +63,20 @@ public class MovieSyncAdapter extends AbstractThreadedSyncAdapter {
 
             for (int i = 0; i < jaMovies.length(); i++) {
                 joData = jaMovies.getJSONObject(i);
-                ContentValues weatherValues = new ContentValues();
-                weatherValues.put(MovieEntry.COLUMN_MOVIE_ID, joData.getString(Constants.MOVIE_JSON.ID));
-                weatherValues.put(MovieEntry.COLUMN_SAVED_FOR, Application.sp.getInt(Constants.SP_SORT_BY, 0));
-                weatherValues.put(MovieEntry.COLUMN_TITLE, joData.getString(Constants.MOVIE_JSON.TITLE));
-                weatherValues.put(MovieEntry.COLUMN_OVERVIEW, joData.getString(Constants.MOVIE_JSON.OVERVIEW));
-                weatherValues.put(MovieEntry.COLUMN_POSTER_PATH, joData.getString(Constants.MOVIE_JSON.POSTER));
-                weatherValues.put(MovieEntry.COLUMN_BACKDROP_PATH, joData.getString(Constants.MOVIE_JSON.BACKDROP));
-                weatherValues.put(MovieEntry.COLUMN_RELEASE_DATE, joData.getString(Constants.MOVIE_JSON.RELEASE_DATE));
-                weatherValues.put(MovieEntry.COLUMN_VOTE_AVERAGE, joData.getString(Constants.MOVIE_JSON.VOTE_AVERAGE));
-                weatherValues.put(MovieEntry.COLUMN_VOTE_COUNT, joData.getString(Constants.MOVIE_JSON.VOTE_COUNT));
-                weatherValues.put(MovieEntry.COLUMN_CAST, "");
-                weatherValues.put(MovieEntry.COLUMN_VIDEO_LINK, "");
-                weatherValues.put(MovieEntry.COLUMN_REVIEWS, "");
-                cVVector.add(weatherValues);
+                ContentValues movieValues = new ContentValues();
+                movieValues.put(MovieEntry.COLUMN_MOVIE_ID, joData.getString(Constants.MOVIE_JSON.ID));
+                movieValues.put(MovieEntry.COLUMN_SAVED_FOR, Application.sp.getInt(Constants.SP_SORT_BY, 0));
+                movieValues.put(MovieEntry.COLUMN_TITLE, joData.getString(Constants.MOVIE_JSON.TITLE));
+                movieValues.put(MovieEntry.COLUMN_OVERVIEW, joData.getString(Constants.MOVIE_JSON.OVERVIEW));
+                movieValues.put(MovieEntry.COLUMN_POSTER_PATH, joData.getString(Constants.MOVIE_JSON.POSTER));
+                movieValues.put(MovieEntry.COLUMN_BACKDROP_PATH, joData.getString(Constants.MOVIE_JSON.BACKDROP));
+                movieValues.put(MovieEntry.COLUMN_RELEASE_DATE, joData.getString(Constants.MOVIE_JSON.RELEASE_DATE));
+                movieValues.put(MovieEntry.COLUMN_VOTE_AVERAGE, joData.getString(Constants.MOVIE_JSON.VOTE_AVERAGE));
+                movieValues.put(MovieEntry.COLUMN_VOTE_COUNT, joData.getString(Constants.MOVIE_JSON.VOTE_COUNT));
+                movieValues.put(MovieEntry.COLUMN_CAST, "");
+                movieValues.put(MovieEntry.COLUMN_VIDEO_LINK, "");
+                movieValues.put(MovieEntry.COLUMN_REVIEWS, "");
+                cVVector.add(movieValues);
             }
             if (cVVector.size() > 0) {
                 ContentValues[] cvArray = new ContentValues[cVVector.size()];
@@ -140,6 +90,7 @@ public class MovieSyncAdapter extends AbstractThreadedSyncAdapter {
             e.printStackTrace();
         }
     }
+
 
     private boolean checkIfResultExists(String s) {
         JSONObject joData = null;
@@ -196,7 +147,7 @@ public class MovieSyncAdapter extends AbstractThreadedSyncAdapter {
         syncImmediately(context);
     }
 
-    public static void initializeSyncAdapter(Context context) {
-        getSyncAccount(context);
-    }
+//    public static void initializeSyncAdapter(Context context) {
+//        getSyncAccount(context);
+//    }
 }

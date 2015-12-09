@@ -10,8 +10,8 @@
     <!-- Poster size-->
     <dimen name="poster_width">185dp</dimen>
     <dimen name="poster_height">278dp</dimen>
-    <dimen name="poster_small_width">139dp</dimen>
-    <dimen name="poster_small_height">210dp</dimen>
+    <dimen name="poster_small_width">111dp</dimen>
+    <dimen name="poster_small_height">167dp</dimen>
     <!-- Backdrop size-->
     <dimen name="backdrop_width">342dp</dimen>
     <dimen name="backdrop_height">192dp</dimen>

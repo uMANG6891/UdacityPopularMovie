@@ -16,11 +16,6 @@ import com.squareup.picasso.Picasso;
 import com.umang.popularmovies.R;
 import com.umang.popularmovies.ui.activity.DetailActivity;
 import com.umang.popularmovies.utility.Constants;
-import com.umang.popularmovies.utility.Constants.MOVIE_JSON;
-
-import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.HashMap;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
@@ -34,16 +29,9 @@ public class AdapterPosters extends RecyclerView.Adapter<AdapterPosters.VH> {
     Context con;
     Cursor MOVIE_DATA;
 
-    // movie related urls and image sizes
-    public static final String BASE_IMAGE_URL = "http://image.tmdb.org/t/p/";
-    String POSTER_SIZE;
-    String BACKDROP_SIZE;
-
     public AdapterPosters(Activity con, Cursor data) {
         this.con = con;
         this.MOVIE_DATA = data;
-        POSTER_SIZE = con.getString(R.string.poster_size);
-        BACKDROP_SIZE = con.getString(R.string.backdrop_size);
     }
 
     @Override
@@ -58,7 +46,7 @@ public class AdapterPosters extends RecyclerView.Adapter<AdapterPosters.VH> {
         holder.tvMovieName.setText(MOVIE_DATA.getString(Constants.RV_COL_TITLE));
         holder.tvMovieRating.setText(MOVIE_DATA.getString(Constants.RV_COL_VOTE_AVERAGE));
         Picasso.with(con)
-                .load(BASE_IMAGE_URL + BACKDROP_SIZE + MOVIE_DATA.getString(Constants.RV_COL_POSTER_PATH))
+                .load(Constants.BASE_IMAGE_URL + Constants.BACKDROP_SIZE + MOVIE_DATA.getString(Constants.RV_COL_POSTER_PATH))
                 .into(holder.ivPoster);
     }
 
@@ -73,9 +61,9 @@ public class AdapterPosters extends RecyclerView.Adapter<AdapterPosters.VH> {
         notifyDataSetChanged();
     }
 
-    public Serializable getOneMovieData(int position) {
-        HashMap<String, String> row = new HashMap<>();
-        return row;
+    public int getMovieId(int position) {
+        MOVIE_DATA.moveToPosition(position);
+        return MOVIE_DATA.getInt(Constants.RV_COL_MOVIE_ID);
     }
 
 
@@ -101,7 +89,7 @@ public class AdapterPosters extends RecyclerView.Adapter<AdapterPosters.VH> {
         @Override
         public void onClick(View v) {
             Intent i = new Intent(con, DetailActivity.class);
-            i.putExtra(DetailActivity.EXTRA_MOVIE_DATA, getOneMovieData(getAdapterPosition()));
+            i.putExtra(DetailActivity.EXTRA_MOVIE_ID, getMovieId(getAdapterPosition()));
             con.startActivity(i);
         }
     }

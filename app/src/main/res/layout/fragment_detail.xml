@@ -36,8 +36,8 @@
                         android:layout_height="@dimen/poster_small_height"
                         android:layout_marginTop="@dimen/activity_vertical_margin"
                         android:orientation="vertical"
-                        android:paddingLeft="178dp"
-                        android:paddingStart="178dp">
+                        android:paddingLeft="144dp"
+                        android:paddingStart="144dp">
 
                         <TextView
                             android:id="@+id/frag_d_tv_movie_name"

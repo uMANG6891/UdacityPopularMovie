@@ -19,7 +19,7 @@ import butterknife.ButterKnife;
  */
 public class DetailActivity extends AppCompatActivity {
 
-    public static final String EXTRA_MOVIE_DATA = "extra_movie_data";
+    public static final String EXTRA_MOVIE_ID = "extra_movie_data";
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
