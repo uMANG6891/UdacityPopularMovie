@@ -1,17 +1,14 @@
 package com.umang.popularmovies.ui.activity;
 
-import android.os.Build;
 import android.os.Bundle;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
-import android.view.WindowManager;
 
 import com.umang.popularmovies.R;
 import com.umang.popularmovies.ui.fragments.DetailActivityFragment;
 
-import butterknife.Bind;
 import butterknife.ButterKnife;
 
 /**
@@ -26,12 +23,7 @@ public class DetailActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_detail);
         ButterKnife.bind(this);
-
-        ActionBar actionbar = getSupportActionBar();
-        if (actionbar != null) {
-            actionbar.setDisplayShowHomeEnabled(true);
-            actionbar.setDisplayHomeAsUpEnabled(true);
-        }
+        setTitle("");
 
         if (savedInstanceState == null) {
             getSupportFragmentManager()

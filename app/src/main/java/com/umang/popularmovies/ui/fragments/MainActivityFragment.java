@@ -1,12 +1,9 @@
 package com.umang.popularmovies.ui.fragments;
 
 import android.app.AlertDialog;
-import android.content.ContentValues;
 import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.database.Cursor;
-import android.net.Uri;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
@@ -30,22 +27,6 @@ import com.umang.popularmovies.data.MovieContract.MovieEntry;
 import com.umang.popularmovies.sync.MovieSyncAdapter;
 import com.umang.popularmovies.ui.adapters.AdapterPosters;
 import com.umang.popularmovies.utility.Constants;
-import com.umang.popularmovies.utility.Constants.MOVIE_JSON;
-import com.umang.popularmovies.utility.Debug;
-
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.net.HttpURLConnection;
-import java.net.URL;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Vector;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;

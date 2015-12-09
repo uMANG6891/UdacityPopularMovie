@@ -1,47 +1,42 @@
 <?xml version="1.0" encoding="utf-8"?>
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <ImageView
-        android:id="@+id/frag_d_iv_backdrop"
-        android:layout_width="match_parent"
-        android:layout_height="@dimen/backdrop_height"
-        android:scaleType="centerCrop" />
-
-    <RelativeLayout
-        android:id="@+id/frag_d_rl_trailer_overlay"
-        android:layout_width="match_parent"
-        android:layout_height="@dimen/backdrop_height"
-        android:background="#22000000"
-        android:clickable="true">
-
-        <ImageView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_centerInParent="true"
-            android:src="@drawable/ic_action_play" />
-    </RelativeLayout>
-
-    <ScrollView
+    <com.github.ksoichiro.android.observablescrollview.ObservableScrollView
+        android:id="@+id/frag_d_osv_scroll"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-        <LinearLayout
-            android:id="@+id/frag_d_first_element"
+        <RelativeLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical">
+            android:layout_height="wrap_content">
+
+            <ImageView
+                android:id="@+id/frag_d_iv_backdrop"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/backdrop_height"
+                android:scaleType="centerCrop" />
 
             <RelativeLayout
-                android:id="@+id/frag_d_rl_trailer_overlay_click"
+                android:id="@+id/frag_d_rl_trailer_overlay"
                 android:layout_width="match_parent"
-                android:layout_height="@dimen/backdrop_height_below_layout"
-                android:clickable="true" />
+                android:layout_height="@dimen/backdrop_height"
+                android:background="#22000000"
+                android:clickable="true">
+
+                <ImageView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerInParent="true"
+                    android:src="@drawable/ic_action_play" />
+            </RelativeLayout>
 
             <FrameLayout
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content">
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/backdrop_height_below_layout">
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -116,6 +111,7 @@
                     <View style="@style/ViewLineSeparator" />
 
                     <LinearLayout
+                        android:id="@+id/frag_d_ll_read_more"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_margin="@dimen/activity_vertical_margin"
@@ -141,9 +137,11 @@
                     <View style="@style/ViewLineSeparator" />
 
                     <LinearLayout
+                        android:id="@+id/frag_d_ll_reviews_parent"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:orientation="vertical">
+                        android:orientation="vertical"
+                        android:visibility="gone">
 
                         <TextView
                             android:layout_width="wrap_content"
@@ -174,6 +172,30 @@
                     android:scaleType="centerCrop" />
             </FrameLayout>
 
-        </LinearLayout>
-    </ScrollView>
+        </RelativeLayout>
+    </com.github.ksoichiro.android.observablescrollview.ObservableScrollView>
+
+    <android.support.design.widget.AppBarLayout
+        android:id="@+id/frag_d_abl_appbar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/transparent"
+        android:paddingTop="@dimen/translucent_toolbar_padding_top"
+        android:theme="@style/AppTheme.AppBarOverlay"
+        app:elevation="0dp">
+
+        <android.support.v7.widget.Toolbar
+            android:id="@+id/frag_d_tb_toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize">
+
+            <TextView
+                android:id="@+id/frag_d_tb_tv_movie_name"
+                style="@style/Base.TextAppearance.AppCompat.Title"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:alpha="0"
+                android:singleLine="true" />
+        </android.support.v7.widget.Toolbar>
+    </android.support.design.widget.AppBarLayout>
 </FrameLayout>

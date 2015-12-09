@@ -27,6 +27,10 @@
             android:name=".ui.activity.DetailActivity"
             android:theme="@style/AppTheme.NoActionBar.Translucent" />
 
+        <activity
+            android:name=".ui.activity.MovieReadMoreActivity"
+            android:theme="@style/AppTheme.NoActionBar.Translucent" />
+
         <provider
             android:name=".data.MovieProvider"
             android:authorities="com.umang.popularmovies"

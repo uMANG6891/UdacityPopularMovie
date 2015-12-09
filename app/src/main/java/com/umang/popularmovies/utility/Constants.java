@@ -1,7 +1,5 @@
 package com.umang.popularmovies.utility;
 
-import com.umang.popularmovies.data.MovieContract.MovieEntry;
-
 /**
  * Created by umang on 20/11/15.
  */
@@ -9,7 +7,7 @@ public class Constants {
     public static final String MOVIE_DB_API_KEY = "YOUR_MOVIEDB_API_KEY"; // Enter your themoviedb api key here
 
     public static final String BASE_MOVIE_DB_URL = "http://api.themoviedb.org/3/";
-    public static final String BASE_IMAGE_URL = "http://image.tmdb.org/t/p/";
+    public static final String BASE_IMAGE_URL = "http://image.tmdb.org/t/p/";z
 
     public static final double MOVIE_POSTER_MULTIPLIER = 1.5;
     public static final double MOVIE_BACKDROP_MULTIPLIER = 0.5617977528089888; // ~( 1/1.78)

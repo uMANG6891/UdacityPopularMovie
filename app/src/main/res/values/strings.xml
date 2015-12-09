@@ -28,4 +28,10 @@
     <string name="sync_account_type">com.umang.popuparmovies</string>
     <string name="content_authority">com.umang.popularmovies</string>
     <string name="REVIEWS">REVIEWS</string>
+    <string name="cast_and_credits"><![CDATA[cast & credits]]></string>
+    <string name="tag_actors">Actors</string>
+    <string name="tag_director">Director</string>
+    <string name="tag_producer">Producer</string>
+    <string name="tag_writer">Writer</string>
+    <string name="tag_release_date">Release date</string>
 </resources>
