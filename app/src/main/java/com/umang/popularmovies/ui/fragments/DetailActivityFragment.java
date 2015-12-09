@@ -2,6 +2,7 @@ package com.umang.popularmovies.ui.fragments;
 
 import android.content.Intent;
 import android.database.Cursor;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -13,6 +14,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.squareup.picasso.Picasso;
@@ -21,7 +24,12 @@ import com.umang.popularmovies.data.FetchAsyncData;
 import com.umang.popularmovies.data.MovieContract;
 import com.umang.popularmovies.ui.activity.DetailActivity;
 import com.umang.popularmovies.utility.Constants;
+import com.umang.popularmovies.utility.Debug;
 import com.umang.popularmovies.utility.Utility;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -32,9 +40,16 @@ import butterknife.ButterKnife;
 /**
  * Created by umang on 21/11/15.
  */
-public class DetailActivityFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
+public class DetailActivityFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor>, View.OnClickListener {
 
     FragmentActivity con;
+
+    @Bind(R.id.frag_d_rl_trailer_overlay)
+    RelativeLayout rlVideoOverlay;
+    @Bind(R.id.frag_d_rl_trailer_overlay_click)
+    RelativeLayout rlVideoOverlayClick;
+    @Bind(R.id.frag_d_ll_reviews)
+    LinearLayout llReviews;
 
     @Bind(R.id.frag_d_iv_backdrop)
     ImageView ivBackdrop;
@@ -52,6 +67,7 @@ public class DetailActivityFragment extends Fragment implements LoaderManager.Lo
     TextView tvOverview;
 
     int MOVIE_ID;
+    String LINK;
 
     @Nullable
     @Override
@@ -93,15 +109,48 @@ public class DetailActivityFragment extends Fragment implements LoaderManager.Lo
             tvVotes.setText(data.getString(Constants.RV_COL_VOTE_COUNT).concat(" "));
             tvRating.setText(data.getString(Constants.RV_COL_VOTE_AVERAGE));
             tvOverview.setText(data.getString(Constants.RV_COL_OVERVIEW));
+
             List<String> urls = new ArrayList<>();
             if (data.getString(Constants.RV_COL_CAST) == null || data.getString(Constants.RV_COL_CAST).length() == 0) {
                 urls.add(Constants.BASE_MOVIE_DB_URL + "movie/" + MOVIE_ID + "/credits?api_key=" + Constants.MOVIE_DB_API_KEY);
             }
             if (data.getString(Constants.RV_COL_VIDEO_LINK) == null || data.getString(Constants.RV_COL_VIDEO_LINK).length() == 0) {
                 urls.add(Constants.BASE_MOVIE_DB_URL + "movie/" + MOVIE_ID + "/videos?api_key=" + Constants.MOVIE_DB_API_KEY);
+                rlVideoOverlay.setVisibility(View.GONE);
+                rlVideoOverlayClick.setOnClickListener(null);
+            } else {
+                LINK = data.getString(Constants.RV_COL_VIDEO_LINK);
+                rlVideoOverlay.setVisibility(View.VISIBLE);
+                rlVideoOverlayClick.setOnClickListener(this);
             }
             if (data.getString(Constants.RV_COL_REVIEWS) == null || data.getString(Constants.RV_COL_REVIEWS).length() == 0) {
                 urls.add(Constants.BASE_MOVIE_DB_URL + "movie/" + MOVIE_ID + "/reviews?api_key=" + Constants.MOVIE_DB_API_KEY);
+                llReviews.setVisibility(View.GONE);
+            } else {
+                try {
+                    JSONArray reviews = new JSONArray(data.getString(Constants.RV_COL_REVIEWS));
+                    if (reviews.length() > 0) {
+                        llReviews.setVisibility(View.VISIBLE);
+                        JSONObject oneReview;
+
+                        View view;
+                        TextView tvAuthor;
+                        TextView tvContent;
+                        LayoutInflater inflater = getLayoutInflater(new Bundle());
+                        for (int i = 0; i < reviews.length(); i++) {
+                            oneReview = reviews.getJSONObject(i);
+                            view = inflater.inflate(R.layout.item_review, llReviews, false);
+                            tvAuthor = (TextView) view.findViewById(R.id.item_r_author);
+                            tvContent = (TextView) view.findViewById(R.id.item_r_content);
+
+                            tvAuthor.setText(oneReview.getString("author"));
+                            tvContent.setText(oneReview.getString("content"));
+                            llReviews.addView(view);
+                        }
+                    }
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
             }
             if (urls.size() > 0) {
                 FetchAsyncData task = new FetchAsyncData(con.getBaseContext());
@@ -114,5 +163,16 @@ public class DetailActivityFragment extends Fragment implements LoaderManager.Lo
     @Override
     public void onLoaderReset(Loader<Cursor> loader) {
 
+    }
+
+    @Override
+    public void onClick(View v) {
+        switch (v.getId()) {
+            case R.id.frag_d_rl_trailer_overlay_click:
+                con.startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("http://www.youtube.com/watch?v=" + LINK)));
+                break;
+            default:
+                break;
+        }
     }
 }

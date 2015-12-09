@@ -5,6 +5,8 @@ import android.content.Context;
 import android.net.Uri;
 import android.os.AsyncTask;
 
+import com.umang.popularmovies.utility.Debug;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -117,16 +119,14 @@ public class FetchAsyncData extends AsyncTask<List, Void, Void> {
                 JSONObject jo = new JSONObject(GET_REVIEWS);
                 movieId = jo.getString("id");
                 JSONArray ja = new JSONArray(jo.getString("results"));
-                if (ja.length() > 0) {
-                    JA_REVIEWS = new JSONArray();
-                    JSONObject joUser;
-                    for (int i = 0; i < ja.length() && i < 3; i++) {
-                        jo = ja.getJSONObject(i);
-                        joUser = new JSONObject();
-                        joUser.put("author", jo.getString("author"));
-                        joUser.put("content", jo.getString("content"));
-                        JA_REVIEWS.put(joUser);
-                    }
+                JA_REVIEWS = new JSONArray();
+                JSONObject joUser;
+                for (int i = 0; i < ja.length() && i < 3; i++) {
+                    jo = ja.getJSONObject(i);
+                    joUser = new JSONObject();
+                    joUser.put("author", jo.getString("author"));
+                    joUser.put("content", jo.getString("content"));
+                    JA_REVIEWS.put(joUser);
                 }
             } catch (JSONException e) {
                 e.printStackTrace();
@@ -152,6 +152,7 @@ public class FetchAsyncData extends AsyncTask<List, Void, Void> {
     }
 
     public static String getFromInternet(String MOVIE_URL) {
+        Debug.e("url", MOVIE_URL);
         HttpURLConnection urlConnection = null;
         BufferedReader reader = null;
 

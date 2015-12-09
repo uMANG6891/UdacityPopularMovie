@@ -27,4 +27,5 @@
     <!-- SyncAdapter related -->
     <string name="sync_account_type">com.umang.popuparmovies</string>
     <string name="content_authority">com.umang.popularmovies</string>
+    <string name="REVIEWS">REVIEWS</string>
 </resources>
