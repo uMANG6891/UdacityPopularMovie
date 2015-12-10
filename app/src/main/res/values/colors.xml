@@ -2,8 +2,8 @@
 <resources>
     <color name="colorPrimary">#673AB7</color>
     <color name="colorPrimaryDark">#512DA8</color>
-    <color name="colorAccent">#FFC107</color>
-    <color name="colorAccentDark">#FFA000</color>
+    <color name="colorAccent">#F44336</color>
+    <color name="colorAccentDark">#D32F2F</color>
 
     <color name="horizontal_line_separator">#AAA</color>
 

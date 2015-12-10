@@ -31,14 +31,14 @@ import com.squareup.picasso.Picasso;
 import com.umang.popularmovies.R;
 import com.umang.popularmovies.data.FetchAsyncData;
 import com.umang.popularmovies.data.MovieContract;
+import com.umang.popularmovies.data.MovieContract.CommentEntry;
+import com.umang.popularmovies.data.MovieContract.FavouriteEntry;
+import com.umang.popularmovies.data.MovieContract.MovieEntry;
 import com.umang.popularmovies.ui.activity.DetailActivity;
 import com.umang.popularmovies.ui.activity.MovieReadMoreActivity;
 import com.umang.popularmovies.utility.Constants;
+import com.umang.popularmovies.utility.Debug;
 import com.umang.popularmovies.utility.Utility;
-
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -77,6 +77,8 @@ public class DetailActivityFragment extends Fragment implements LoaderManager.Lo
     ImageView ivBackdrop;
     @Bind(R.id.frag_d_iv_poster)
     ImageView ivPoster;
+    @Bind(R.id.frag_d_iv_fav_movie)
+    ImageView ivFavMovie;
     @Bind(R.id.frag_d_tv_movie_name)
     TextView tvMovieName;
     @Bind(R.id.frag_d_tv_release_date)
@@ -88,9 +90,15 @@ public class DetailActivityFragment extends Fragment implements LoaderManager.Lo
     @Bind(R.id.frag_d_tv_overview)
     TextView tvOverview;
 
+    Cursor MAIN_CURSOR;
     int MOVIE_ID;
     String LINK;
+    boolean IS_FAVOURITE = false;
     int mParallaxImageHeight;
+
+    private final int LOADER_MOVIE_DETAIL = 0;
+    private final int LOADER_COMMENTS = 1;
+    private final int LOADER_FAVOURITE = 2;
 
     @Nullable
     @Override
@@ -112,87 +120,126 @@ public class DetailActivityFragment extends Fragment implements LoaderManager.Lo
         osvScroll.setScrollViewCallbacks(this);
         mParallaxImageHeight = getResources().getDimensionPixelSize(R.dimen.backdrop_height);
         llReadMore.setOnClickListener(this);
+        ivFavMovie.setOnClickListener(this);
 
         Intent intent = con.getIntent();
         if (intent != null && intent.hasExtra(DetailActivity.EXTRA_MOVIE_ID)) {
             MOVIE_ID = intent.getIntExtra(DetailActivity.EXTRA_MOVIE_ID, 0);
         }
-        getLoaderManager().initLoader(0, null, this);
+        getLoaderManager().initLoader(LOADER_MOVIE_DETAIL, null, this);
+        getLoaderManager().initLoader(LOADER_COMMENTS, null, this);
+//        getLoaderManager().initLoader(LOADER_FAVOURITE, null, this);
         return view;
     }
 
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
-        return new CursorLoader(
-                con,
-                MovieContract.MovieEntry.buildOneMovieUri(MOVIE_ID),
-                null,
-                MovieContract.MovieEntry.COLUMN_MOVIE_ID + " = ?",
-                null,
-                null
-        );
+        switch (id) {
+            case LOADER_MOVIE_DETAIL:
+                return new CursorLoader(
+                        con,
+                        MovieEntry.buildOneMovieUri(MOVIE_ID),
+                        Constants.MOVIE_PROJECTION_COLS,
+                        MovieContract.MovieEntry.COLUMN_MOVIE_ID + " = ?",
+                        null,
+                        null
+                );
+            case LOADER_COMMENTS:
+                return new CursorLoader(
+                        con,
+                        CommentEntry.buildCommentUri(MOVIE_ID),
+                        Constants.COMMENT_MOVIE_PROJECTION_COLS,
+                        CommentEntry.COLUMN_MOVIE_ID + " = ?",
+                        null,
+                        null
+                );
+            case LOADER_FAVOURITE:
+                return new CursorLoader(
+                        con,
+                        FavouriteEntry.buildFavouriteMovieUri(MOVIE_ID),
+                        null,
+                        FavouriteEntry.COLUMN_MOVIE_ID + " = ?",
+                        null,
+                        null
+                );
+            default:
+                return null;
+        }
     }
 
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
-        if (data.getCount() > 0) {
-            data.moveToFirst();
-            Picasso.with(con).load(Constants.BASE_IMAGE_URL + Constants.BACKDROP_SIZE + data.getString(Constants.RV_COL_BACKDROP_PATH)).into(ivBackdrop);
-            Picasso.with(con).load(Constants.BASE_IMAGE_URL + Constants.BACKDROP_SIZE + data.getString(Constants.RV_COL_POSTER_PATH)).into(ivPoster);
-            tvMovieName.setText(data.getString(Constants.RV_COL_TITLE));
-            tvToolbarTitle.setText(data.getString(Constants.RV_COL_TITLE));
-            tvReleaseDate.setText(Utility.getYear(data.getString(Constants.RV_COL_RELEASE_DATE)));
-            tvVotes.setText(data.getString(Constants.RV_COL_VOTE_COUNT).concat(" "));
-            tvRating.setText(data.getString(Constants.RV_COL_VOTE_AVERAGE));
-            tvOverview.setText(data.getString(Constants.RV_COL_OVERVIEW));
+        switch (loader.getId()) {
+            case LOADER_MOVIE_DETAIL:
+                MAIN_CURSOR = data;
+                if (data.getCount() > 0) {
+                    data.moveToFirst();
+                    Picasso.with(con).load(Constants.BASE_IMAGE_URL + Constants.BACKDROP_SIZE + data.getString(Constants.RV_COL_MSB_BACKDROP_PATH)).into(ivBackdrop);
+                    Picasso.with(con).load(Constants.BASE_IMAGE_URL + Constants.BACKDROP_SIZE + data.getString(Constants.RV_COL_MSB_POSTER_PATH)).into(ivPoster);
+                    tvMovieName.setText(data.getString(Constants.RV_COL_MSB_TITLE));
+                    tvToolbarTitle.setText(data.getString(Constants.RV_COL_MSB_TITLE));
+                    tvReleaseDate.setText(Utility.getYear(data.getString(Constants.RV_COL_MSB_RELEASE_DATE)));
+                    tvVotes.setText(data.getString(Constants.RV_COL_MSB_VOTE_COUNT).concat(" "));
+                    tvRating.setText(data.getString(Constants.RV_COL_MSB_VOTE_AVERAGE));
+                    tvOverview.setText(data.getString(Constants.RV_COL_MSB_OVERVIEW));
 
-            List<String> urls = new ArrayList<>();
-            if (data.getString(Constants.RV_COL_CAST) == null || data.getString(Constants.RV_COL_CAST).length() == 0) {
-                urls.add(Constants.BASE_MOVIE_DB_URL + "movie/" + MOVIE_ID + "/credits?api_key=" + Constants.MOVIE_DB_API_KEY);
-            }
-            if (data.getString(Constants.RV_COL_VIDEO_LINK) == null || data.getString(Constants.RV_COL_VIDEO_LINK).length() == 0) {
-                urls.add(Constants.BASE_MOVIE_DB_URL + "movie/" + MOVIE_ID + "/videos?api_key=" + Constants.MOVIE_DB_API_KEY);
-                rlVideoOverlay.setVisibility(View.GONE);
-            } else {
-                LINK = data.getString(Constants.RV_COL_VIDEO_LINK);
-                rlVideoOverlay.setVisibility(View.VISIBLE);
-                rlVideoOverlay.setOnClickListener(this);
-            }
-
-            if (data.getString(Constants.RV_COL_REVIEWS) == null || data.getString(Constants.RV_COL_REVIEWS).length() == 0) {
-                urls.add(Constants.BASE_MOVIE_DB_URL + "movie/" + MOVIE_ID + "/reviews?api_key=" + Constants.MOVIE_DB_API_KEY);
-                llReviewsParent.setVisibility(View.GONE);
-            } else {
-                try {
-                    JSONArray reviews = new JSONArray(data.getString(Constants.RV_COL_REVIEWS));
-                    if (reviews.length() > 0) {
-                        llReviewsParent.setVisibility(View.VISIBLE);
-                        JSONObject oneReview;
-
-                        View view;
-                        TextView tvAuthor;
-                        TextView tvContent;
-                        LayoutInflater inflater = getLayoutInflater(new Bundle());
-                        for (int i = 0; i < reviews.length(); i++) {
-                            oneReview = reviews.getJSONObject(i);
-                            view = inflater.inflate(R.layout.item_review, llReviews, false);
-                            tvAuthor = (TextView) view.findViewById(R.id.item_r_author);
-                            tvContent = (TextView) view.findViewById(R.id.item_r_content);
-
-                            tvAuthor.setText(oneReview.getString("author"));
-                            tvContent.setText(oneReview.getString("content"));
-                            llReviews.addView(view);
-                        }
+                    List<String> urls = new ArrayList<>();
+                    if (data.getString(Constants.RV_COL_MSB_CAST) == null || data.getString(Constants.RV_COL_MSB_CAST).length() == 0) {
+                        urls.add(Constants.BASE_MOVIE_DB_URL + "movie/" + MOVIE_ID + "/credits?api_key=" + Constants.MOVIE_DB_API_KEY);
                     }
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
-            }
-            if (urls.size() > 0) {
-                FetchAsyncData task = new FetchAsyncData(con.getBaseContext());
-                task.execute(urls);
-            }
+                    if (data.getString(Constants.RV_COL_MSB_VIDEO_LINK) == null || data.getString(Constants.RV_COL_MSB_VIDEO_LINK).length() == 0) {
+                        urls.add(Constants.BASE_MOVIE_DB_URL + "movie/" + MOVIE_ID + "/videos?api_key=" + Constants.MOVIE_DB_API_KEY);
+                        rlVideoOverlay.setVisibility(View.GONE);
+                    } else {
+                        LINK = data.getString(Constants.RV_COL_MSB_VIDEO_LINK);
+                        rlVideoOverlay.setVisibility(View.VISIBLE);
+                        rlVideoOverlay.setOnClickListener(this);
+                    }
+
+                    if (urls.size() > 0) {
+                        FetchAsyncData task = new FetchAsyncData(con.getBaseContext());
+                        task.execute(urls);
+                    }
 //            ((DetailActivity) con).setActionBarTitle(row.get(MOVIE_JSON.TITLE)); // setting the title in the toolbar
+                }
+                break;
+            case LOADER_COMMENTS:
+                if (data.getCount() == 0) {
+                    List<String> urls = new ArrayList<>();
+                    urls.add(Constants.BASE_MOVIE_DB_URL + "movie/" + MOVIE_ID + "/reviews?api_key=" + Constants.MOVIE_DB_API_KEY);
+                    FetchAsyncData task = new FetchAsyncData(con.getBaseContext());
+                    task.execute(urls);
+                    llReviewsParent.setVisibility(View.GONE);
+                } else {
+                    llReviewsParent.setVisibility(View.VISIBLE);
+
+                    View view;
+                    TextView tvAuthor;
+                    TextView tvContent;
+                    LayoutInflater inflater = getLayoutInflater(new Bundle());
+                    for (int i = 0; i < data.getCount(); i++) {
+                        data.moveToPosition(i);
+                        view = inflater.inflate(R.layout.item_review, llReviews, false);
+                        tvAuthor = (TextView) view.findViewById(R.id.item_r_author);
+                        tvContent = (TextView) view.findViewById(R.id.item_r_content);
+
+                        tvAuthor.setText(data.getString(Constants.RV_COL_CM_AUTHOR));
+                        tvContent.setText(data.getString(Constants.RV_COL_MCM_CONTENT));
+                        llReviews.addView(view);
+                    }
+                }
+                break;
+            case LOADER_FAVOURITE:
+                if (data.getCount() > 0) {
+                    IS_FAVOURITE = true;
+                    ivFavMovie.setImageResource(R.drawable.ic_action_fav);
+                } else {
+                    IS_FAVOURITE = false;
+                    ivFavMovie.setImageResource(R.drawable.ic_action_fav_border);
+                }
+                break;
+            default:
+                break;
         }
     }
 
@@ -204,6 +251,25 @@ public class DetailActivityFragment extends Fragment implements LoaderManager.Lo
     @Override
     public void onClick(View v) {
         switch (v.getId()) {
+            case R.id.frag_d_iv_fav_movie:
+                if (IS_FAVOURITE) {
+                } else {
+//                    MAIN_CURSOR.moveToFirst();
+//                    ContentValues movieValues = new ContentValues();
+//                    movieValues.put(MovieContract.MovieEntry.COLUMN_MOVIE_ID, MAIN_CURSOR.getString(Constants.MOVIE_JSON.ID));
+//                    movieValues.put(MovieContract.MovieEntry.COLUMN_SAVED_FOR, Constants.ROW_FAVOURITE);
+//                    movieValues.put(MovieContract.MovieEntry.COLUMN_TITLE, MAIN_CURSOR.getString(Constants.MOVIE_JSON.TITLE));
+//                    movieValues.put(MovieContract.MovieEntry.COLUMN_OVERVIEW, MAIN_CURSOR.getString(Constants.MOVIE_JSON.OVERVIEW));
+//                    movieValues.put(MovieContract.MovieEntry.COLUMN_POSTER_PATH, MAIN_CURSOR.getString(Constants.MOVIE_JSON.POSTER));
+//                    movieValues.put(MovieContract.MovieEntry.COLUMN_BACKDROP_PATH, MAIN_CURSOR.getString(Constants.MOVIE_JSON.BACKDROP));
+//                    movieValues.put(MovieContract.MovieEntry.COLUMN_RELEASE_DATE, MAIN_CURSOR.getString(Constants.MOVIE_JSON.RELEASE_DATE));
+//                    movieValues.put(MovieContract.MovieEntry.COLUMN_VOTE_AVERAGE, MAIN_CURSOR.getString(Constants.MOVIE_JSON.VOTE_AVERAGE));
+//                    movieValues.put(MovieContract.MovieEntry.COLUMN_VOTE_COUNT, MAIN_CURSOR.getString(Constants.MOVIE_JSON.VOTE_COUNT));
+//                    movieValues.put(MovieContract.MovieEntry.COLUMN_CAST, "");
+//                    movieValues.put(MovieContract.MovieEntry.COLUMN_VIDEO_LINK, "");
+//                    movieValues.put(MovieContract.MovieEntry.COLUMN_REVIEWS, "");
+                }
+                break;
             case R.id.frag_d_rl_trailer_overlay:
                 startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("http://www.youtube.com/watch?v=" + LINK)));
                 break;

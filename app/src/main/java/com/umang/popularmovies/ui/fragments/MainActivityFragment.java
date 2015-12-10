@@ -23,7 +23,7 @@ import android.widget.TextView;
 
 import com.umang.popularmovies.Application;
 import com.umang.popularmovies.R;
-import com.umang.popularmovies.data.MovieContract.MovieEntry;
+import com.umang.popularmovies.data.MovieContract.CollectionEntry;
 import com.umang.popularmovies.sync.MovieSyncAdapter;
 import com.umang.popularmovies.ui.adapters.AdapterPosters;
 import com.umang.popularmovies.utility.Constants;
@@ -131,9 +131,9 @@ public class MainActivityFragment extends Fragment implements LoaderManager.Load
             case LOADER_MOVIES:
                 return new CursorLoader(
                         con,
-                        MovieEntry.buildMovieForSavedForUri(Application.sp.getInt(Constants.SP_SORT_BY, 0)),
-                        null,
-                        MovieEntry.COLUMN_SAVED_FOR + " = ?",
+                        CollectionEntry.buildMovieForSavedForUri(Application.sp.getInt(Constants.SP_SORT_BY, 0)),
+                        Constants.MOVIE_PROJECTION_COLS,
+                        CollectionEntry.COLUMN_SAVED_FOR + " = ?",
                         null,
                         null
                 );

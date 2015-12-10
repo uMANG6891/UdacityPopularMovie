@@ -43,10 +43,10 @@ public class AdapterPosters extends RecyclerView.Adapter<AdapterPosters.VH> {
     @Override
     public void onBindViewHolder(VH holder, int position) {
         MOVIE_DATA.moveToPosition(position);
-        holder.tvMovieName.setText(MOVIE_DATA.getString(Constants.RV_COL_TITLE));
-        holder.tvMovieRating.setText(MOVIE_DATA.getString(Constants.RV_COL_VOTE_AVERAGE));
+        holder.tvMovieName.setText(MOVIE_DATA.getString(Constants.RV_COL_MSB_TITLE));
+        holder.tvMovieRating.setText(MOVIE_DATA.getString(Constants.RV_COL_MSB_VOTE_AVERAGE));
         Picasso.with(con)
-                .load(Constants.BASE_IMAGE_URL + Constants.BACKDROP_SIZE + MOVIE_DATA.getString(Constants.RV_COL_POSTER_PATH))
+                .load(Constants.BASE_IMAGE_URL + Constants.BACKDROP_SIZE + MOVIE_DATA.getString(Constants.RV_COL_MSB_POSTER_PATH))
                 .into(holder.ivPoster);
     }
 
@@ -63,7 +63,7 @@ public class AdapterPosters extends RecyclerView.Adapter<AdapterPosters.VH> {
 
     public int getMovieId(int position) {
         MOVIE_DATA.moveToPosition(position);
-        return MOVIE_DATA.getInt(Constants.RV_COL_MOVIE_ID);
+        return MOVIE_DATA.getInt(Constants.RV_COL_MSB_MOVIE_ID);
     }
 
 

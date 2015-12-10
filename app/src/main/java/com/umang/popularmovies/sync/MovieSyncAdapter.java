@@ -15,6 +15,8 @@ import android.os.Bundle;
 import com.umang.popularmovies.Application;
 import com.umang.popularmovies.R;
 import com.umang.popularmovies.data.FetchAsyncData;
+import com.umang.popularmovies.data.MovieContract;
+import com.umang.popularmovies.data.MovieContract.CollectionEntry;
 import com.umang.popularmovies.data.MovieContract.MovieEntry;
 import com.umang.popularmovies.utility.Constants;
 
@@ -59,13 +61,15 @@ public class MovieSyncAdapter extends AbstractThreadedSyncAdapter {
             JSONObject joData = new JSONObject(s);
             JSONArray jaMovies = new JSONArray(joData.getString(Constants.MOVIE_JSON.JSON_RESULT));
 
-            Vector<ContentValues> cVVector = new Vector<>(jaMovies.length());
+            Vector<ContentValues> cvvMovies = new Vector<>(jaMovies.length());
+            Vector<ContentValues> cvvCollection = new Vector<>(jaMovies.length());
 
             for (int i = 0; i < jaMovies.length(); i++) {
                 joData = jaMovies.getJSONObject(i);
                 ContentValues movieValues = new ContentValues();
+                ContentValues collectionValues = new ContentValues();
+
                 movieValues.put(MovieEntry.COLUMN_MOVIE_ID, joData.getString(Constants.MOVIE_JSON.ID));
-                movieValues.put(MovieEntry.COLUMN_SAVED_FOR, Application.sp.getInt(Constants.SP_SORT_BY, 0));
                 movieValues.put(MovieEntry.COLUMN_TITLE, joData.getString(Constants.MOVIE_JSON.TITLE));
                 movieValues.put(MovieEntry.COLUMN_OVERVIEW, joData.getString(Constants.MOVIE_JSON.OVERVIEW));
                 movieValues.put(MovieEntry.COLUMN_POSTER_PATH, joData.getString(Constants.MOVIE_JSON.POSTER));
@@ -73,18 +77,29 @@ public class MovieSyncAdapter extends AbstractThreadedSyncAdapter {
                 movieValues.put(MovieEntry.COLUMN_RELEASE_DATE, joData.getString(Constants.MOVIE_JSON.RELEASE_DATE));
                 movieValues.put(MovieEntry.COLUMN_VOTE_AVERAGE, joData.getString(Constants.MOVIE_JSON.VOTE_AVERAGE));
                 movieValues.put(MovieEntry.COLUMN_VOTE_COUNT, joData.getString(Constants.MOVIE_JSON.VOTE_COUNT));
-                movieValues.put(MovieEntry.COLUMN_CAST, "");
-                movieValues.put(MovieEntry.COLUMN_VIDEO_LINK, "");
-                movieValues.put(MovieEntry.COLUMN_REVIEWS, "");
-                cVVector.add(movieValues);
+
+                collectionValues.put(CollectionEntry.COLUMN_MOVIE_ID, joData.getString(Constants.MOVIE_JSON.ID));
+                collectionValues.put(CollectionEntry.COLUMN_SAVED_FOR, Application.sp.getInt(Constants.SP_SORT_BY, 0));
+
+                cvvMovies.add(movieValues);
+                cvvCollection.add(collectionValues);
             }
-            if (cVVector.size() > 0) {
-                ContentValues[] cvArray = new ContentValues[cVVector.size()];
-                cVVector.toArray(cvArray);
-                getContext().getContentResolver().delete(MovieEntry.CONTENT_URI,
-                        MovieEntry.COLUMN_SAVED_FOR + " = ?",
+            if (cvvMovies.size() > 0) {
+                // delete old data from the collection.
+                // Also remove from movie which isn't marked as favourite or in the collection table
+                getContext().getContentResolver().delete(MovieContract.CollectionEntry.CONTENT_URI,
+                        MovieContract.CollectionEntry.COLUMN_SAVED_FOR + " = ?",
                         new String[]{String.valueOf(Application.sp.getInt(Constants.SP_SORT_BY, 0))});
+
+                // add all movies
+                ContentValues[] cvArray = new ContentValues[cvvMovies.size()];
+                cvvMovies.toArray(cvArray);
                 getContext().getContentResolver().bulkInsert(MovieEntry.CONTENT_URI, cvArray);
+
+                // add all collections
+                cvArray = new ContentValues[cvvCollection.size()];
+                cvvCollection.toArray(cvArray);
+                getContext().getContentResolver().bulkInsert(CollectionEntry.CONTENT_URI, cvArray);
             }
         } catch (JSONException e) {
             e.printStackTrace();

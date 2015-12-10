@@ -5,6 +5,8 @@ import android.content.Context;
 import android.net.Uri;
 import android.os.AsyncTask;
 
+import com.umang.popularmovies.data.MovieContract.CommentEntry;
+import com.umang.popularmovies.data.MovieContract.MovieEntry;
 import com.umang.popularmovies.utility.Debug;
 
 import org.json.JSONArray;
@@ -18,6 +20,7 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.List;
+import java.util.Vector;
 
 /**
  * Created by umang on 08/12/15.
@@ -62,7 +65,6 @@ public class FetchAsyncData extends AsyncTask<List, Void, Void> {
 
         JSONObject CAST = null;
         String LINK = null;
-        JSONArray JA_REVIEWS = null;
 
         if (GET_CAST != null) {
             try {
@@ -119,15 +121,25 @@ public class FetchAsyncData extends AsyncTask<List, Void, Void> {
                 JSONObject jo = new JSONObject(GET_REVIEWS);
                 movieId = jo.getString("id");
                 JSONArray ja = new JSONArray(jo.getString("results"));
-                JA_REVIEWS = new JSONArray();
-                JSONObject joUser;
+
+                Vector<ContentValues> cvvComments = new Vector<>(ja.length());
                 for (int i = 0; i < ja.length() && i < 3; i++) {
                     jo = ja.getJSONObject(i);
-                    joUser = new JSONObject();
-                    joUser.put("author", jo.getString("author"));
-                    joUser.put("content", jo.getString("content"));
-                    JA_REVIEWS.put(joUser);
+                    ContentValues movieValues = new ContentValues();
+                    movieValues.put(CommentEntry.COLUMN_MOVIE_ID, movieId);
+                    movieValues.put(CommentEntry.COLUMN_AUTHOR, jo.getString("author"));
+                    movieValues.put(CommentEntry.COLUMN_CONTENT, jo.getString("content"));
+                    cvvComments.add(movieValues);
                 }
+
+                if (cvvComments.size() > 0) {
+                    // add all comments
+                    ContentValues[] cvArray = new ContentValues[cvvComments.size()];
+                    cvvComments.toArray(cvArray);
+                    con.getContentResolver().bulkInsert(CommentEntry.CONTENT_URI, cvArray);
+                }
+                // making it null, so that code on bottom wont update movie table
+                movieId = null;
             } catch (JSONException e) {
                 e.printStackTrace();
             }
@@ -139,12 +151,10 @@ public class FetchAsyncData extends AsyncTask<List, Void, Void> {
         if (movieId != null) {
             ContentValues values = new ContentValues();
             if (CAST != null)
-                values.put(MovieContract.MovieEntry.COLUMN_CAST, CAST.toString());
+                values.put(MovieEntry.COLUMN_CAST, CAST.toString());
             if (LINK != null)
-                values.put(MovieContract.MovieEntry.COLUMN_VIDEO_LINK, LINK);
-            if (JA_REVIEWS != null)
-                values.put(MovieContract.MovieEntry.COLUMN_REVIEWS, JA_REVIEWS.toString());
-            con.getContentResolver().update(MovieContract.MovieEntry.CONTENT_URI,
+                values.put(MovieEntry.COLUMN_VIDEO_LINK, LINK);
+            con.getContentResolver().update(MovieEntry.CONTENT_URI,
                     values,
                     MovieContract.MovieEntry.COLUMN_MOVIE_ID + " = ?",
                     new String[]{movieId});

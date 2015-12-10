@@ -94,12 +94,12 @@ public class MovieReadMoreFragment extends Fragment implements LoaderManager.Loa
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
         if (data.getCount() > 0) {
             data.moveToFirst();
-            con.setTitle(data.getString(Constants.RV_COL_TITLE));
+            con.setTitle(data.getString(Constants.RV_COL_MSB_TITLE));
 
-            tvReleaseDate.setText(Utility.getYear(data.getString(Constants.RV_COL_RELEASE_DATE)));
-            tvOverview.setText(data.getString(Constants.RV_COL_OVERVIEW));
+            tvReleaseDate.setText(Utility.getYear(data.getString(Constants.RV_COL_MSB_RELEASE_DATE)));
+            tvOverview.setText(data.getString(Constants.RV_COL_MSB_OVERVIEW));
 
-            String castJSON = data.getString(Constants.RV_COL_CAST);
+            String castJSON = data.getString(Constants.RV_COL_MSB_CAST);
 
             if (castJSON != null) {
                 try {
