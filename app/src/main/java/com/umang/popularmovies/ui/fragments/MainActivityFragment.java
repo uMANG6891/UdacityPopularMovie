@@ -24,6 +24,7 @@ import android.widget.TextView;
 import com.umang.popularmovies.Application;
 import com.umang.popularmovies.R;
 import com.umang.popularmovies.data.MovieContract.CollectionEntry;
+import com.umang.popularmovies.data.MovieContract.FavouriteEntry;
 import com.umang.popularmovies.sync.MovieSyncAdapter;
 import com.umang.popularmovies.ui.adapters.AdapterPosters;
 import com.umang.popularmovies.utility.Constants;
@@ -49,8 +50,10 @@ public class MainActivityFragment extends Fragment implements LoaderManager.Load
     AdapterPosters adapter;
 
 
-    private static final int LOADER_MOVIES = 0;
+    private static final int LOADER_COLLECTION_MOVIES = 0;
+    private static final int LOADER_MY_FAVOURITE_MOVIES = 1;
 
+    String[] sortItems;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -64,18 +67,32 @@ public class MainActivityFragment extends Fragment implements LoaderManager.Load
         adapter = new AdapterPosters(con, null);
         rvPosters.setLayoutManager(new GridLayoutManager(con, con.getResources().getInteger(R.integer.main_grid_columns)));
         rvPosters.setAdapter(adapter);
+        sortItems = getResources().getStringArray(R.array.sort_by_array);
         loadMovieData();
         showLoading();
 
-        String[] sortItems = getResources().getStringArray(R.array.sort_by_array);
-        con.setTitle(sortItems[Application.sp.getInt(Constants.SP_SORT_BY, 0)]);
         return view;
     }
 
     private void loadMovieData() {
-        adapter.changeBase(null);
-        getLoaderManager().initLoader(LOADER_MOVIES, null, this);
+        loadAdapterWithData(null);
+        int t = Application.sp.getInt(Constants.SP_SORT_BY, 0);
+        con.setTitle(sortItems[Application.sp.getInt(Constants.SP_SORT_BY, 0)]);
+        if (t >= 0 && t <= 1) {
+            getLoaderManager().restartLoader(LOADER_COLLECTION_MOVIES, null, MainActivityFragment.this);
+        } else {
+            getLoaderManager().restartLoader(LOADER_MY_FAVOURITE_MOVIES, null, MainActivityFragment.this);
+        }
         showLoading();
+    }
+
+    private void loadAdapterWithData(Cursor data) {
+        if (data == null) {
+            rvPosters.setVisibility(View.GONE);
+        } else {
+            rvPosters.setVisibility(View.VISIBLE);
+        }
+        adapter.changeBase(data);
     }
 
     private void showLoading() {
@@ -109,12 +126,12 @@ public class MainActivityFragment extends Fragment implements LoaderManager.Load
                         .setSingleChoiceItems(sortItems, Application.sp.getInt(Constants.SP_SORT_BY, 0), new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
+                                con.setTitle(sortItems[which]);
                                 editor = Application.sp.edit();
                                 editor.putInt(Constants.SP_SORT_BY, which);
                                 editor.apply();
                                 dialog.dismiss();
-                                con.setTitle(sortItems[which]);
-                                getLoaderManager().restartLoader(LOADER_MOVIES, null, MainActivityFragment.this);
+                                loadMovieData();
                                 showLoading();
                             }
                         });
@@ -128,12 +145,21 @@ public class MainActivityFragment extends Fragment implements LoaderManager.Load
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
         switch (id) {
-            case LOADER_MOVIES:
+            case LOADER_COLLECTION_MOVIES:
                 return new CursorLoader(
                         con,
                         CollectionEntry.buildMovieForSavedForUri(Application.sp.getInt(Constants.SP_SORT_BY, 0)),
                         Constants.MOVIE_PROJECTION_COLS,
                         CollectionEntry.COLUMN_SAVED_FOR + " = ?",
+                        null,
+                        null
+                );
+            case LOADER_MY_FAVOURITE_MOVIES:
+                return new CursorLoader(
+                        con,
+                        FavouriteEntry.CONTENT_URI,
+                        Constants.MOVIE_PROJECTION_COLS,
+                        null,
                         null,
                         null
                 );
@@ -145,14 +171,28 @@ public class MainActivityFragment extends Fragment implements LoaderManager.Load
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
         switch (loader.getId()) {
-            case LOADER_MOVIES:
+            case LOADER_COLLECTION_MOVIES:
                 hideLoading();
-                if (data.getCount() == 0) {
-                    MovieSyncAdapter.syncImmediately(getActivity());
-                    showErrorText(getString(R.string.error_getting_data));
-                } else {
-                    showErrorText("");
-                    adapter.changeBase(data);
+                if (Application.sp.getInt(Constants.SP_SORT_BY, 0) >= Constants.ROW_POPULAR &&
+                        Application.sp.getInt(Constants.SP_SORT_BY, 0) <= Constants.ROW_HIGHEST_RATED) {
+                    if (data.getCount() == 0) {
+                        MovieSyncAdapter.syncImmediately(getActivity());
+                        showErrorText(getString(R.string.error_getting_data));
+                    } else {
+                        showErrorText("");
+                    }
+                    loadAdapterWithData(data);
+                }
+                break;
+            case LOADER_MY_FAVOURITE_MOVIES:
+                hideLoading();
+                if (Application.sp.getInt(Constants.SP_SORT_BY, 0) == Constants.ROW_MY_FAVOURITES) {
+                    if (data.getCount() > 0) {
+                        showErrorText("");
+                    } else {
+                        showErrorText(getString(R.string.error_no_favourite_movies_found));
+                    }
+                    loadAdapterWithData(data);
                 }
             default:
                 break;

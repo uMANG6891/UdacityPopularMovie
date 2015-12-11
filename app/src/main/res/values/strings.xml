@@ -21,6 +21,7 @@
     <string-array name="sort_by_array">
         <item>Most popular</item>
         <item>Highest rated</item>
+        <item>My favourites</item>
     </string-array>
 
 
@@ -28,6 +29,7 @@
     <string name="sync_account_type">com.umang.popuparmovies</string>
     <string name="content_authority">com.umang.popularmovies</string>
     <string name="REVIEWS">REVIEWS</string>
+
     <string name="cast_and_credits"><![CDATA[cast & credits]]></string>
     <string name="tag_actors">Actors</string>
     <string name="tag_director">Director</string>
@@ -35,4 +37,8 @@
     <string name="tag_writer">Writer</string>
     <string name="tag_release_date">Release date</string>
     <string name="favourite_this_movie">Favourite this movie</string>
+
+    <string name="removed_from_favourites">removed from favourites</string>
+    <string name="added_to_favourites">added to favourites</string>
+    <string name="error_no_favourite_movies_found">No favourite movies found</string>
 </resources>

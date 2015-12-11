@@ -29,6 +29,7 @@ public class MovieProvider extends ContentProvider {
     static final int COLLECTION_SAVED_FOR = 201;
 
     static final int FAVOURITE = 300;
+    static final int FAVOURITE_ONE = 301;
 
     static final int COMMENT = 400;
 
@@ -44,6 +45,7 @@ public class MovieProvider extends ContentProvider {
         matcher.addURI(authority, MovieContract.PATH_COLLECTION + "/" + CollectionEntry.TAG_SAVED_FOR + "/#", COLLECTION_SAVED_FOR);
 
         matcher.addURI(authority, MovieContract.PATH_FAVOURITE, FAVOURITE);
+        matcher.addURI(authority, MovieContract.PATH_FAVOURITE + "/#", FAVOURITE_ONE);
 
         matcher.addURI(authority, MovieContract.PATH_COMMENT, COMMENT);
 
@@ -89,13 +91,11 @@ public class MovieProvider extends ContentProvider {
                         " = " + MovieEntry.TABLE_NAME + "." + MovieEntry.COLUMN_MOVIE_ID);
     }
 
-    private Cursor getMovieByFavourite(Uri uri, String[] projection, String sortOrder) {
-        String saved_for = String.valueOf(CollectionEntry.getSavedForTypeFromUri(uri));
-
+    private Cursor getMovieByFavourite(String[] projection, String sortOrder) {
         return sMovieByFavouriteQueryBuilder.query(mOpenHelper.getReadableDatabase(),
                 projection,
-                CollectionEntry.TABLE_NAME + "." + CollectionEntry.COLUMN_SAVED_FOR + " = ?",
-                new String[]{saved_for},
+                null,
+                null,
                 null,
                 null,
                 sortOrder
@@ -139,6 +139,7 @@ public class MovieProvider extends ContentProvider {
     @Override
     public Cursor query(Uri uri, String[] projection, String selection, String[] selectionArgs, String sortOrder) {
         Cursor retCursor;
+        String movie_id;
         switch (sUriMatcher.match(uri)) {
 
             // "comment/"
@@ -146,9 +147,22 @@ public class MovieProvider extends ContentProvider {
                 retCursor = getCommentByMovieFor(uri, projection, sortOrder);
                 break;
 
+            // "favourite/#"
+            case FAVOURITE_ONE:
+                movie_id = String.valueOf(FavouriteEntry.getMovieIdFromFavouriteUri(uri));
+                retCursor = mOpenHelper.getReadableDatabase().query(
+                        FavouriteEntry.TABLE_NAME,
+                        projection,
+                        selection,
+                        new String[]{movie_id},
+                        null,
+                        null,
+                        sortOrder
+                );
+                break;
             // "favourite/"
             case FAVOURITE:
-                retCursor = getMovieByFavourite(uri, projection, sortOrder);
+                retCursor = getMovieByFavourite(projection, sortOrder);
                 break;
 
             // "collection/saved_for/*"
@@ -158,7 +172,7 @@ public class MovieProvider extends ContentProvider {
 
             // "movie/#"
             case MOVIE_ONE:
-                String movie_id = String.valueOf(MovieEntry.getMovieIdFromUri(uri));
+                movie_id = String.valueOf(MovieEntry.getMovieIdFromUri(uri));
                 retCursor = mOpenHelper.getReadableDatabase().query(
                         MovieEntry.TABLE_NAME,
                         projection,
@@ -199,6 +213,8 @@ public class MovieProvider extends ContentProvider {
             case COMMENT:
                 return CommentEntry.CONTENT_TYPE;
 
+            case FAVOURITE_ONE:
+                return FavouriteEntry.CONTENT_ITEM_TYPE;
             case FAVOURITE:
                 return FavouriteEntry.CONTENT_TYPE;
 
@@ -220,10 +236,11 @@ public class MovieProvider extends ContentProvider {
         final SQLiteDatabase db = mOpenHelper.getWritableDatabase();
         final int match = sUriMatcher.match(uri);
         Uri returnUri;
+        long _id;
 
         switch (match) {
             case MOVIE:
-                long _id = db.insert(MovieEntry.TABLE_NAME, null, values);
+                _id = db.insert(MovieEntry.TABLE_NAME, null, values);
                 if (_id > 0) {
                     returnUri = MovieEntry.buildOneMovieUri(_id);
                 } else {
@@ -245,7 +262,14 @@ public class MovieProvider extends ContentProvider {
 //                } else {
 //                    throw new android.database.SQLException("Failed to insert row into " + uri);
 //                }
-//                break;
+            case FAVOURITE:
+                _id = db.insert(FavouriteEntry.TABLE_NAME, null, values);
+                if (_id > 0) {
+                    returnUri = MovieEntry.buildOneMovieUri(_id);
+                } else {
+                    throw new android.database.SQLException("Failed to insert row into " + uri);
+                }
+                break;
             default:
                 throw new UnsupportedOperationException("Unknown uri: " + uri);
         }

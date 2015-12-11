@@ -19,6 +19,7 @@ public class Constants {
 
     public static final int ROW_POPULAR = 0;
     public static final int ROW_HIGHEST_RATED = 1;
+    public static final int ROW_MY_FAVOURITES = 2;
 
     public static String POSTER_SIZE;
     public static String BACKDROP_SIZE;
@@ -29,6 +30,18 @@ public class Constants {
             // for highest rating the vote_count should be greater than 1000
             // to account for movie being rated 10 with only been rated once or twice
     };
+
+    public static String buildGetMovieReview(int MOVIE_ID) {
+        return BASE_MOVIE_DB_URL + "movie/" + MOVIE_ID + "/credits?api_key=" + MOVIE_DB_API_KEY;
+    }
+
+    public static String buildGetMovieVideoLink(int MOVIE_ID) {
+        return Constants.BASE_MOVIE_DB_URL + "movie/" + MOVIE_ID + "/videos?api_key=" + Constants.MOVIE_DB_API_KEY;
+    }
+
+    public static String buildGetMovieComments(int MOVIE_ID) {
+        return Constants.BASE_MOVIE_DB_URL + "movie/" + MOVIE_ID + "/reviews?api_key=" + Constants.MOVIE_DB_API_KEY;
+    }
 
 
     public class MOVIE_JSON {

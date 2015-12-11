@@ -1,5 +1,6 @@
 package com.umang.popularmovies.ui.fragments;
 
+import android.content.ContentValues;
 import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
@@ -22,6 +23,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.github.ksoichiro.android.observablescrollview.ObservableScrollView;
 import com.github.ksoichiro.android.observablescrollview.ObservableScrollViewCallbacks;
@@ -37,7 +39,6 @@ import com.umang.popularmovies.data.MovieContract.MovieEntry;
 import com.umang.popularmovies.ui.activity.DetailActivity;
 import com.umang.popularmovies.ui.activity.MovieReadMoreActivity;
 import com.umang.popularmovies.utility.Constants;
-import com.umang.popularmovies.utility.Debug;
 import com.umang.popularmovies.utility.Utility;
 
 import java.util.ArrayList;
@@ -90,8 +91,8 @@ public class DetailActivityFragment extends Fragment implements LoaderManager.Lo
     @Bind(R.id.frag_d_tv_overview)
     TextView tvOverview;
 
-    Cursor MAIN_CURSOR;
     int MOVIE_ID;
+    String MOVIE_TITLE;
     String LINK;
     boolean IS_FAVOURITE = false;
     int mParallaxImageHeight;
@@ -128,7 +129,7 @@ public class DetailActivityFragment extends Fragment implements LoaderManager.Lo
         }
         getLoaderManager().initLoader(LOADER_MOVIE_DETAIL, null, this);
         getLoaderManager().initLoader(LOADER_COMMENTS, null, this);
-//        getLoaderManager().initLoader(LOADER_FAVOURITE, null, this);
+        getLoaderManager().initLoader(LOADER_FAVOURITE, null, this);
         return view;
     }
 
@@ -171,13 +172,13 @@ public class DetailActivityFragment extends Fragment implements LoaderManager.Lo
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
         switch (loader.getId()) {
             case LOADER_MOVIE_DETAIL:
-                MAIN_CURSOR = data;
                 if (data.getCount() > 0) {
                     data.moveToFirst();
+                    MOVIE_TITLE = data.getString(Constants.RV_COL_MSB_TITLE);
                     Picasso.with(con).load(Constants.BASE_IMAGE_URL + Constants.BACKDROP_SIZE + data.getString(Constants.RV_COL_MSB_BACKDROP_PATH)).into(ivBackdrop);
                     Picasso.with(con).load(Constants.BASE_IMAGE_URL + Constants.BACKDROP_SIZE + data.getString(Constants.RV_COL_MSB_POSTER_PATH)).into(ivPoster);
-                    tvMovieName.setText(data.getString(Constants.RV_COL_MSB_TITLE));
-                    tvToolbarTitle.setText(data.getString(Constants.RV_COL_MSB_TITLE));
+                    tvMovieName.setText(MOVIE_TITLE);
+                    tvToolbarTitle.setText(MOVIE_TITLE);
                     tvReleaseDate.setText(Utility.getYear(data.getString(Constants.RV_COL_MSB_RELEASE_DATE)));
                     tvVotes.setText(data.getString(Constants.RV_COL_MSB_VOTE_COUNT).concat(" "));
                     tvRating.setText(data.getString(Constants.RV_COL_MSB_VOTE_AVERAGE));
@@ -185,10 +186,10 @@ public class DetailActivityFragment extends Fragment implements LoaderManager.Lo
 
                     List<String> urls = new ArrayList<>();
                     if (data.getString(Constants.RV_COL_MSB_CAST) == null || data.getString(Constants.RV_COL_MSB_CAST).length() == 0) {
-                        urls.add(Constants.BASE_MOVIE_DB_URL + "movie/" + MOVIE_ID + "/credits?api_key=" + Constants.MOVIE_DB_API_KEY);
+                        urls.add(Constants.buildGetMovieReview(MOVIE_ID));
                     }
                     if (data.getString(Constants.RV_COL_MSB_VIDEO_LINK) == null || data.getString(Constants.RV_COL_MSB_VIDEO_LINK).length() == 0) {
-                        urls.add(Constants.BASE_MOVIE_DB_URL + "movie/" + MOVIE_ID + "/videos?api_key=" + Constants.MOVIE_DB_API_KEY);
+                        urls.add(Constants.buildGetMovieVideoLink(MOVIE_ID));
                         rlVideoOverlay.setVisibility(View.GONE);
                     } else {
                         LINK = data.getString(Constants.RV_COL_MSB_VIDEO_LINK);
@@ -206,7 +207,7 @@ public class DetailActivityFragment extends Fragment implements LoaderManager.Lo
             case LOADER_COMMENTS:
                 if (data.getCount() == 0) {
                     List<String> urls = new ArrayList<>();
-                    urls.add(Constants.BASE_MOVIE_DB_URL + "movie/" + MOVIE_ID + "/reviews?api_key=" + Constants.MOVIE_DB_API_KEY);
+                    urls.add(Constants.buildGetMovieComments(MOVIE_ID));
                     FetchAsyncData task = new FetchAsyncData(con.getBaseContext());
                     task.execute(urls);
                     llReviewsParent.setVisibility(View.GONE);
@@ -231,6 +232,9 @@ public class DetailActivityFragment extends Fragment implements LoaderManager.Lo
                 break;
             case LOADER_FAVOURITE:
                 if (data.getCount() > 0) {
+                    for (int i = 0; i < data.getCount(); i++) {
+                        data.moveToPosition(i);
+                    }
                     IS_FAVOURITE = true;
                     ivFavMovie.setImageResource(R.drawable.ic_action_fav);
                 } else {
@@ -253,21 +257,15 @@ public class DetailActivityFragment extends Fragment implements LoaderManager.Lo
         switch (v.getId()) {
             case R.id.frag_d_iv_fav_movie:
                 if (IS_FAVOURITE) {
+                    con.getContentResolver().delete(FavouriteEntry.CONTENT_URI,
+                            FavouriteEntry.COLUMN_MOVIE_ID + " = ?",
+                            new String[]{String.valueOf(MOVIE_ID)});
+                    Toast.makeText(con, MOVIE_TITLE + " " + getString(R.string.removed_from_favourites), Toast.LENGTH_SHORT).show();
                 } else {
-//                    MAIN_CURSOR.moveToFirst();
-//                    ContentValues movieValues = new ContentValues();
-//                    movieValues.put(MovieContract.MovieEntry.COLUMN_MOVIE_ID, MAIN_CURSOR.getString(Constants.MOVIE_JSON.ID));
-//                    movieValues.put(MovieContract.MovieEntry.COLUMN_SAVED_FOR, Constants.ROW_FAVOURITE);
-//                    movieValues.put(MovieContract.MovieEntry.COLUMN_TITLE, MAIN_CURSOR.getString(Constants.MOVIE_JSON.TITLE));
-//                    movieValues.put(MovieContract.MovieEntry.COLUMN_OVERVIEW, MAIN_CURSOR.getString(Constants.MOVIE_JSON.OVERVIEW));
-//                    movieValues.put(MovieContract.MovieEntry.COLUMN_POSTER_PATH, MAIN_CURSOR.getString(Constants.MOVIE_JSON.POSTER));
-//                    movieValues.put(MovieContract.MovieEntry.COLUMN_BACKDROP_PATH, MAIN_CURSOR.getString(Constants.MOVIE_JSON.BACKDROP));
-//                    movieValues.put(MovieContract.MovieEntry.COLUMN_RELEASE_DATE, MAIN_CURSOR.getString(Constants.MOVIE_JSON.RELEASE_DATE));
-//                    movieValues.put(MovieContract.MovieEntry.COLUMN_VOTE_AVERAGE, MAIN_CURSOR.getString(Constants.MOVIE_JSON.VOTE_AVERAGE));
-//                    movieValues.put(MovieContract.MovieEntry.COLUMN_VOTE_COUNT, MAIN_CURSOR.getString(Constants.MOVIE_JSON.VOTE_COUNT));
-//                    movieValues.put(MovieContract.MovieEntry.COLUMN_CAST, "");
-//                    movieValues.put(MovieContract.MovieEntry.COLUMN_VIDEO_LINK, "");
-//                    movieValues.put(MovieContract.MovieEntry.COLUMN_REVIEWS, "");
+                    ContentValues favMovieValues = new ContentValues();
+                    favMovieValues.put(FavouriteEntry.COLUMN_MOVIE_ID, MOVIE_ID);
+                    con.getContentResolver().insert(FavouriteEntry.CONTENT_URI, favMovieValues);
+                    Toast.makeText(con, MOVIE_TITLE + " " + getString(R.string.added_to_favourites), Toast.LENGTH_SHORT).show();
                 }
                 break;
             case R.id.frag_d_rl_trailer_overlay:
