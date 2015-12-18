@@ -170,13 +170,13 @@ public class MainActivityFragment extends Fragment implements LoaderManager.Load
 
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
+        int sortBy = Application.sp.getInt(Constants.SP_SORT_BY, 0);
         switch (loader.getId()) {
             case LOADER_COLLECTION_MOVIES:
                 hideLoading();
-                if (Application.sp.getInt(Constants.SP_SORT_BY, 0) >= Constants.ROW_POPULAR &&
-                        Application.sp.getInt(Constants.SP_SORT_BY, 0) <= Constants.ROW_HIGHEST_RATED) {
+                if (sortBy >= Constants.ROW_POPULAR && sortBy <= Constants.ROW_HIGHEST_RATED) {
                     if (data.getCount() == 0) {
-                        MovieSyncAdapter.syncImmediately(getActivity());
+                        MovieSyncAdapter.syncImmediately(getActivity(), MovieSyncAdapter.SYNC_BOTH);
                         showErrorText(getString(R.string.error_getting_data));
                     } else {
                         showErrorText("");
@@ -186,7 +186,7 @@ public class MainActivityFragment extends Fragment implements LoaderManager.Load
                 break;
             case LOADER_MY_FAVOURITE_MOVIES:
                 hideLoading();
-                if (Application.sp.getInt(Constants.SP_SORT_BY, 0) == Constants.ROW_MY_FAVOURITES) {
+                if (sortBy == Constants.ROW_MY_FAVOURITES) {
                     if (data.getCount() > 0) {
                         showErrorText("");
                     } else {

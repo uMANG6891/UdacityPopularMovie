@@ -12,7 +12,6 @@ import android.content.SyncResult;
 import android.os.Build;
 import android.os.Bundle;
 
-import com.umang.popularmovies.Application;
 import com.umang.popularmovies.R;
 import com.umang.popularmovies.data.FetchAsyncData;
 import com.umang.popularmovies.data.MovieContract;
@@ -34,6 +33,12 @@ public class MovieSyncAdapter extends AbstractThreadedSyncAdapter {
     // Interval at which to sync with the weather, in seconds. => 24 hours
     public static final int SYNC_INTERVAL = 60 * 60 * 24;
     public static final int SYNC_FLEXTIME = SYNC_INTERVAL / 3;
+
+    public static final String EXTRA_SYNC_TYPE = "sync_type";
+    public static final int SYNC_MOST_POPULAR = 0;
+    public static final int SYNC_HIGHEST_RATED = 1;
+    public static final int SYNC_BOTH = 2;
+
     private static final long DAY_IN_MILLIS = 1000 * 60 * 60 * 24;
     private static final int MOVIE_NOTIFICATION_ID = 10001;
 
@@ -44,19 +49,36 @@ public class MovieSyncAdapter extends AbstractThreadedSyncAdapter {
     @Override
     public void onPerformSync(Account account, Bundle extras, String authority, ContentProviderClient provider, SyncResult syncResult) {
 
-        String API_KEY = Constants.MOVIE_DB_API_KEY;
-        String MOVIE_URL = Constants.BASE_MOVIE_DB_URL + "discover/movie?sort_by="
-                + Constants.MOVIE_URL[Application.sp.getInt(Constants.SP_SORT_BY, 0)]
-                + "&api_key=" + API_KEY;
+        int syncType = extras.getInt(EXTRA_SYNC_TYPE, 0);
 
-        String movies = FetchAsyncData.getFromInternet(MOVIE_URL);
-        if (movies != null && checkIfResultExists(movies)) {
-            saveMovies(movies);
+        String[] MOVIE_URL;
+        if (syncType == SYNC_MOST_POPULAR || syncType == SYNC_HIGHEST_RATED) {
+            MOVIE_URL = new String[]{getMovieUrl(syncType)};
+        } else {
+            MOVIE_URL = new String[]{getMovieUrl(SYNC_MOST_POPULAR), getMovieUrl(SYNC_HIGHEST_RATED)};
+        }
+
+        for (int i = 0; i < MOVIE_URL.length; i++) {
+            String movies = FetchAsyncData.getFromInternet(MOVIE_URL[i]);
+            if (movies != null && checkIfResultExists(movies)) {
+                if (syncType == SYNC_MOST_POPULAR || syncType == SYNC_HIGHEST_RATED) {
+                    saveMovies(movies, syncType);
+                } else {
+                    int saveFor = i == 0 ? SYNC_MOST_POPULAR : SYNC_HIGHEST_RATED;
+                    saveMovies(movies, saveFor);
+                }
+            }
         }
     }
 
+    private String getMovieUrl(int movieType) {
+        return Constants.BASE_MOVIE_DB_URL + "discover/movie?sort_by="
+                + Constants.MOVIE_URL[movieType]
+                + "&api_key=" + Constants.MOVIE_DB_API_KEY;
+    }
 
-    private void saveMovies(String s) {
+
+    private void saveMovies(String s, int saveMovieFor) {
         try {
             JSONObject joData = new JSONObject(s);
             JSONArray jaMovies = new JSONArray(joData.getString(Constants.MOVIE_JSON.JSON_RESULT));
@@ -79,7 +101,7 @@ public class MovieSyncAdapter extends AbstractThreadedSyncAdapter {
                 movieValues.put(MovieEntry.COLUMN_VOTE_COUNT, joData.getString(Constants.MOVIE_JSON.VOTE_COUNT));
 
                 collectionValues.put(CollectionEntry.COLUMN_MOVIE_ID, joData.getString(Constants.MOVIE_JSON.ID));
-                collectionValues.put(CollectionEntry.COLUMN_SAVED_FOR, Application.sp.getInt(Constants.SP_SORT_BY, 0));
+                collectionValues.put(CollectionEntry.COLUMN_SAVED_FOR, saveMovieFor);
 
                 cvvMovies.add(movieValues);
                 cvvCollection.add(collectionValues);
@@ -89,7 +111,7 @@ public class MovieSyncAdapter extends AbstractThreadedSyncAdapter {
                 // Also remove from movie which isn't marked as favourite or in the collection table
                 getContext().getContentResolver().delete(MovieContract.CollectionEntry.CONTENT_URI,
                         MovieContract.CollectionEntry.COLUMN_SAVED_FOR + " = ?",
-                        new String[]{String.valueOf(Application.sp.getInt(Constants.SP_SORT_BY, 0))});
+                        new String[]{String.valueOf(saveMovieFor)});
 
                 // add all movies
                 ContentValues[] cvArray = new ContentValues[cvvMovies.size()];
@@ -133,10 +155,11 @@ public class MovieSyncAdapter extends AbstractThreadedSyncAdapter {
         }
     }
 
-    public static void syncImmediately(Context context) {
+    public static void syncImmediately(Context context, int sync) {
         Bundle bundle = new Bundle();
         bundle.putBoolean(ContentResolver.SYNC_EXTRAS_EXPEDITED, true);
         bundle.putBoolean(ContentResolver.SYNC_EXTRAS_MANUAL, true);
+        bundle.putInt(EXTRA_SYNC_TYPE, sync);
         ContentResolver.requestSync(getSyncAccount(context),
                 context.getString(R.string.content_authority), bundle);
     }
@@ -159,7 +182,7 @@ public class MovieSyncAdapter extends AbstractThreadedSyncAdapter {
     private static void onAccountCreated(Account newAccount, Context context) {
         MovieSyncAdapter.configurePeriodicSync(context, SYNC_INTERVAL, SYNC_FLEXTIME);
         ContentResolver.setSyncAutomatically(newAccount, context.getString(R.string.content_authority), true);
-        syncImmediately(context);
+        syncImmediately(context, SYNC_BOTH);
     }
 
 //    public static void initializeSyncAdapter(Context context) {

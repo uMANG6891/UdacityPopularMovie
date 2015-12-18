@@ -99,6 +99,7 @@ public class FetchAsyncData extends AsyncTask<List, Void, Void> {
             } catch (JSONException e) {
                 e.printStackTrace();
             }
+            GET_CAST = null;
         }
         if (GET_VIDEO_LINK != null) {
             try {
@@ -115,18 +116,19 @@ public class FetchAsyncData extends AsyncTask<List, Void, Void> {
             } catch (JSONException e) {
                 e.printStackTrace();
             }
+            GET_VIDEO_LINK = null;
         }
         if (GET_REVIEWS != null) {
             try {
                 JSONObject jo = new JSONObject(GET_REVIEWS);
-                movieId = jo.getString("id");
+                String movieIdLocal = jo.getString("id");
                 JSONArray ja = new JSONArray(jo.getString("results"));
 
                 Vector<ContentValues> cvvComments = new Vector<>(ja.length());
                 for (int i = 0; i < ja.length() && i < 3; i++) {
                     jo = ja.getJSONObject(i);
                     ContentValues movieValues = new ContentValues();
-                    movieValues.put(CommentEntry.COLUMN_MOVIE_ID, movieId);
+                    movieValues.put(CommentEntry.COLUMN_MOVIE_ID, movieIdLocal);
                     movieValues.put(CommentEntry.COLUMN_AUTHOR, jo.getString("author"));
                     movieValues.put(CommentEntry.COLUMN_CONTENT, jo.getString("content"));
                     cvvComments.add(movieValues);
@@ -138,11 +140,10 @@ public class FetchAsyncData extends AsyncTask<List, Void, Void> {
                     cvvComments.toArray(cvArray);
                     con.getContentResolver().bulkInsert(CommentEntry.CONTENT_URI, cvArray);
                 }
-                // making it null, so that code on bottom wont update movie table
-                movieId = null;
             } catch (JSONException e) {
                 e.printStackTrace();
             }
+            GET_REVIEWS = null;
         }
 //        case GET_SIMILAR_MOVIES:
 //        break;
