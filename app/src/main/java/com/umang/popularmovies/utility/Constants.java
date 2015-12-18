@@ -7,7 +7,7 @@ import com.umang.popularmovies.data.MovieContract.MovieEntry;
  * Created by umang on 20/11/15.
  */
 public class Constants {
-    public static final String MOVIE_DB_API_KEY = "YOUR_MOVIEDB_API_KEY"; // Enter your themoviedb api key here
+    public static final String MOVIE_DB_API_KEY = "2664d35ecd46efece6de342ffa0e2cd6"; // Enter your themoviedb api key here
 
     public static final String BASE_MOVIE_DB_URL = "http://api.themoviedb.org/3/";
     public static final String BASE_IMAGE_URL = "http://image.tmdb.org/t/p/";
@@ -31,6 +31,9 @@ public class Constants {
             // to account for movie being rated 10 with only been rated once or twice
     };
 
+    // extras passed between activities and fragments
+
+    public static final String EXTRA_MOVIE_ID = "extra_movie_data";
     public static String buildGetMovieReview(int MOVIE_ID) {
         return BASE_MOVIE_DB_URL + "movie/" + MOVIE_ID + "/credits?api_key=" + MOVIE_DB_API_KEY;
     }

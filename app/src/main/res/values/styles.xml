@@ -26,6 +26,7 @@
         <item name="android:layout_marginBottom">8dp</item>
         <item name="android:layout_marginRight">8dp</item>
         <item name="android:layout_marginLeft">8dp</item>
+        <!--<item name="setPreventCornerOverlap">true</item>-->
     </style>
 
     <style name="CardViewDefault.Clickable" parent="CardViewDefault">
@@ -51,6 +52,7 @@
 
 
     <style name="AppTheme.AppBarOverlay.Light" parent="ThemeOverlay.AppCompat.ActionBar" />
+
     <style name="AppTheme.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
 
     <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />

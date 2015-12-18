@@ -2,7 +2,6 @@ package com.umang.popularmovies.ui.adapters;
 
 import android.app.Activity;
 import android.content.Context;
-import android.content.Intent;
 import android.database.Cursor;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
@@ -14,7 +13,6 @@ import android.widget.TextView;
 
 import com.squareup.picasso.Picasso;
 import com.umang.popularmovies.R;
-import com.umang.popularmovies.ui.activity.DetailActivity;
 import com.umang.popularmovies.utility.Constants;
 
 import butterknife.Bind;
@@ -67,7 +65,7 @@ public class AdapterPosters extends RecyclerView.Adapter<AdapterPosters.VH> {
     }
 
 
-    class VH extends RecyclerView.ViewHolder implements View.OnClickListener {
+    class VH extends RecyclerView.ViewHolder {
 
         @Bind(R.id.item_mg_cv_main)
         CardView cvMain;
@@ -83,14 +81,6 @@ public class AdapterPosters extends RecyclerView.Adapter<AdapterPosters.VH> {
         public VH(View view) {
             super(view);
             ButterKnife.bind(this, view);
-            cvMain.setOnClickListener(this);
-        }
-
-        @Override
-        public void onClick(View v) {
-            Intent i = new Intent(con, DetailActivity.class);
-            i.putExtra(DetailActivity.EXTRA_MOVIE_ID, getMovieId(getAdapterPosition()));
-            con.startActivity(i);
         }
     }
 }

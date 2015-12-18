@@ -6,17 +6,12 @@ import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.support.design.widget.AppBarLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
-import android.support.v7.app.ActionBar;
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
@@ -28,7 +23,6 @@ import android.widget.Toast;
 import com.github.ksoichiro.android.observablescrollview.ObservableScrollView;
 import com.github.ksoichiro.android.observablescrollview.ObservableScrollViewCallbacks;
 import com.github.ksoichiro.android.observablescrollview.ScrollState;
-import com.github.ksoichiro.android.observablescrollview.ScrollUtils;
 import com.squareup.picasso.Picasso;
 import com.umang.popularmovies.R;
 import com.umang.popularmovies.data.FetchAsyncData;
@@ -36,7 +30,6 @@ import com.umang.popularmovies.data.MovieContract;
 import com.umang.popularmovies.data.MovieContract.CommentEntry;
 import com.umang.popularmovies.data.MovieContract.FavouriteEntry;
 import com.umang.popularmovies.data.MovieContract.MovieEntry;
-import com.umang.popularmovies.ui.activity.DetailActivity;
 import com.umang.popularmovies.ui.activity.MovieReadMoreActivity;
 import com.umang.popularmovies.utility.Constants;
 import com.umang.popularmovies.utility.Utility;
@@ -64,13 +57,6 @@ public class DetailActivityFragment extends Fragment implements LoaderManager.Lo
     @Bind(R.id.frag_d_ll_read_more)
     LinearLayout llReadMore;
 
-    @Bind(R.id.frag_d_abl_appbar)
-    AppBarLayout appbar;
-    @Bind(R.id.frag_d_tb_toolbar)
-    Toolbar toolbar;
-    @Bind(R.id.frag_d_tb_tv_movie_name)
-    TextView tvToolbarTitle;
-
     @Bind(R.id.frag_d_osv_scroll)
     ObservableScrollView osvScroll;
 
@@ -80,8 +66,6 @@ public class DetailActivityFragment extends Fragment implements LoaderManager.Lo
     ImageView ivPoster;
     @Bind(R.id.frag_d_iv_fav_movie)
     ImageView ivFavMovie;
-    @Bind(R.id.frag_d_tv_movie_name)
-    TextView tvMovieName;
     @Bind(R.id.frag_d_tv_release_date)
     TextView tvReleaseDate;
     @Bind(R.id.frag_d_tv_votes)
@@ -91,11 +75,11 @@ public class DetailActivityFragment extends Fragment implements LoaderManager.Lo
     @Bind(R.id.frag_d_tv_overview)
     TextView tvOverview;
 
+
     int MOVIE_ID;
     String MOVIE_TITLE;
     String LINK;
     boolean IS_FAVOURITE = false;
-    int mParallaxImageHeight;
 
     private final int LOADER_MOVIE_DETAIL = 0;
     private final int LOADER_COMMENTS = 1;
@@ -110,26 +94,18 @@ public class DetailActivityFragment extends Fragment implements LoaderManager.Lo
         View view = inflater.inflate(R.layout.fragment_detail, container, false);
         ButterKnife.bind(this, view);
 
-        ((AppCompatActivity) con).setSupportActionBar(toolbar);
-        ActionBar actionbar = ((AppCompatActivity) con).getSupportActionBar();
-        if (actionbar != null) {
-            setHasOptionsMenu(true);
-            actionbar.setHomeButtonEnabled(true);
-            actionbar.setDisplayHomeAsUpEnabled(true);
-        }
-
         osvScroll.setScrollViewCallbacks(this);
-        mParallaxImageHeight = getResources().getDimensionPixelSize(R.dimen.backdrop_height);
         llReadMore.setOnClickListener(this);
         ivFavMovie.setOnClickListener(this);
 
-        Intent intent = con.getIntent();
-        if (intent != null && intent.hasExtra(DetailActivity.EXTRA_MOVIE_ID)) {
-            MOVIE_ID = intent.getIntExtra(DetailActivity.EXTRA_MOVIE_ID, 0);
+        if (getArguments() != null) {
+            MOVIE_ID = getArguments().getInt(Constants.EXTRA_MOVIE_ID, -1);
+            if (MOVIE_ID != -1) {
+                getLoaderManager().initLoader(LOADER_MOVIE_DETAIL, null, this);
+                getLoaderManager().initLoader(LOADER_COMMENTS, null, this);
+                getLoaderManager().initLoader(LOADER_FAVOURITE, null, this);
+            }
         }
-        getLoaderManager().initLoader(LOADER_MOVIE_DETAIL, null, this);
-        getLoaderManager().initLoader(LOADER_COMMENTS, null, this);
-        getLoaderManager().initLoader(LOADER_FAVOURITE, null, this);
         return view;
     }
 
@@ -177,8 +153,6 @@ public class DetailActivityFragment extends Fragment implements LoaderManager.Lo
                     MOVIE_TITLE = data.getString(Constants.RV_COL_MSB_TITLE);
                     Picasso.with(con).load(Constants.BASE_IMAGE_URL + Constants.BACKDROP_SIZE + data.getString(Constants.RV_COL_MSB_BACKDROP_PATH)).into(ivBackdrop);
                     Picasso.with(con).load(Constants.BASE_IMAGE_URL + Constants.BACKDROP_SIZE + data.getString(Constants.RV_COL_MSB_POSTER_PATH)).into(ivPoster);
-                    tvMovieName.setText(MOVIE_TITLE);
-                    tvToolbarTitle.setText(MOVIE_TITLE);
                     tvReleaseDate.setText(Utility.getYear(data.getString(Constants.RV_COL_MSB_RELEASE_DATE)));
                     tvVotes.setText(data.getString(Constants.RV_COL_MSB_VOTE_COUNT).concat(" "));
                     tvRating.setText(data.getString(Constants.RV_COL_MSB_VOTE_AVERAGE));
@@ -231,14 +205,13 @@ public class DetailActivityFragment extends Fragment implements LoaderManager.Lo
                 }
                 break;
             case LOADER_FAVOURITE:
-                if (data.getCount() > 0) {
-                    for (int i = 0; i < data.getCount(); i++) {
-                        data.moveToPosition(i);
-                    }
-                    IS_FAVOURITE = true;
+                IS_FAVOURITE = data.getCount() > 0;
+                if (IS_FAVOURITE) {
+//                    for (int i = 0; i < data.getCount(); i++) {
+//                        data.moveToPosition(i);
+//                    }
                     ivFavMovie.setImageResource(R.drawable.ic_action_fav);
                 } else {
-                    IS_FAVOURITE = false;
                     ivFavMovie.setImageResource(R.drawable.ic_action_fav_border);
                 }
                 break;
@@ -281,25 +254,9 @@ public class DetailActivityFragment extends Fragment implements LoaderManager.Lo
         }
     }
 
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        super.onOptionsItemSelected(item);
-        switch (item.getItemId()) {
-            case android.R.id.home:
-                con.finish();
-                return true;
-            default:
-                return false;
-        }
-    }
 
     @Override
     public void onScrollChanged(int scrollY, boolean firstScroll, boolean dragging) {
-        int baseColor = getResources().getColor(R.color.colorPrimary);
-        float alpha = Math.min(1, (float) scrollY / mParallaxImageHeight);
-        tvToolbarTitle.setAlpha(alpha);
-        appbar.setBackgroundColor(ScrollUtils.getColorWithAlpha(alpha, baseColor));
-
         ivBackdrop.setTranslationY(scrollY / 2);
         rlVideoOverlay.setTranslationY(scrollY / 2);
     }
@@ -312,5 +269,9 @@ public class DetailActivityFragment extends Fragment implements LoaderManager.Lo
     @Override
     public void onUpOrCancelMotionEvent(ScrollState scrollState) {
 
+    }
+
+    public interface AnimateToolbar {
+        public void onScroll(int scrollY);
     }
 }

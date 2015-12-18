@@ -2,6 +2,7 @@ package com.umang.popularmovies.ui.fragments;
 
 import android.app.AlertDialog;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.os.Bundle;
@@ -26,7 +27,9 @@ import com.umang.popularmovies.R;
 import com.umang.popularmovies.data.MovieContract.CollectionEntry;
 import com.umang.popularmovies.data.MovieContract.FavouriteEntry;
 import com.umang.popularmovies.sync.MovieSyncAdapter;
+import com.umang.popularmovies.ui.activity.DetailActivity;
 import com.umang.popularmovies.ui.adapters.AdapterPosters;
+import com.umang.popularmovies.ui.gist.RecyclerViewItemClickListener;
 import com.umang.popularmovies.utility.Constants;
 
 import butterknife.Bind;
@@ -49,7 +52,6 @@ public class MainActivityFragment extends Fragment implements LoaderManager.Load
     SharedPreferences.Editor editor;
     AdapterPosters adapter;
 
-
     private static final int LOADER_COLLECTION_MOVIES = 0;
     private static final int LOADER_MY_FAVOURITE_MOVIES = 1;
 
@@ -67,6 +69,14 @@ public class MainActivityFragment extends Fragment implements LoaderManager.Load
         adapter = new AdapterPosters(con, null);
         rvPosters.setLayoutManager(new GridLayoutManager(con, con.getResources().getInteger(R.integer.main_grid_columns)));
         rvPosters.setAdapter(adapter);
+        rvPosters.addOnItemTouchListener(
+                new RecyclerViewItemClickListener(con, new RecyclerViewItemClickListener.OnItemClickListener() {
+                    @Override
+                    public void onItemClick(View view, int position) {
+                        ((ShowMovieDetailCallback)con).onItemSelected(adapter.getMovieId(position));
+                    }
+                })
+        );
         sortItems = getResources().getStringArray(R.array.sort_by_array);
         loadMovieData();
         showLoading();
@@ -202,6 +212,10 @@ public class MainActivityFragment extends Fragment implements LoaderManager.Load
     @Override
     public void onLoaderReset(Loader<Cursor> loader) {
 
+    }
+
+    public interface ShowMovieDetailCallback {
+        public void onItemSelected(int movieId);
     }
 
 
