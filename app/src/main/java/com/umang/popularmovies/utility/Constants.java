@@ -7,7 +7,7 @@ import com.umang.popularmovies.data.MovieContract.MovieEntry;
  * Created by umang on 20/11/15.
  */
 public class Constants {
-    public static final String MOVIE_DB_API_KEY = "2664d35ecd46efece6de342ffa0e2cd6"; // Enter your themoviedb api key here
+    public static final String MOVIE_DB_API_KEY = "YOUR_MOVIEDB_API_KEY"; // Enter your themoviedb api key here
 
     public static final String BASE_MOVIE_DB_URL = "http://api.themoviedb.org/3/";
     public static final String BASE_IMAGE_URL = "http://image.tmdb.org/t/p/";
@@ -20,6 +20,7 @@ public class Constants {
     public static final int ROW_POPULAR = 0;
     public static final int ROW_HIGHEST_RATED = 1;
     public static final int ROW_MY_FAVOURITES = 2;
+    public static final String YOUTUBE_BASE = "http://www.youtube.com/watch?v=";
 
     public static String POSTER_SIZE;
     public static String BACKDROP_SIZE;
@@ -95,5 +96,5 @@ public class Constants {
     };
 
     public static final int RV_COL_CM_AUTHOR = 0;
-    public static final int RV_COL_MCM_CONTENT = 1;
+    public static final int RV_COL_CM_CONTENT = 1;
 }

@@ -2,7 +2,6 @@ package com.umang.popularmovies.ui.fragments;
 
 import android.app.AlertDialog;
 import android.content.DialogInterface;
-import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.os.Bundle;
@@ -27,7 +26,6 @@ import com.umang.popularmovies.R;
 import com.umang.popularmovies.data.MovieContract.CollectionEntry;
 import com.umang.popularmovies.data.MovieContract.FavouriteEntry;
 import com.umang.popularmovies.sync.MovieSyncAdapter;
-import com.umang.popularmovies.ui.activity.DetailActivity;
 import com.umang.popularmovies.ui.adapters.AdapterPosters;
 import com.umang.popularmovies.ui.gist.RecyclerViewItemClickListener;
 import com.umang.popularmovies.utility.Constants;
@@ -73,7 +71,7 @@ public class MainActivityFragment extends Fragment implements LoaderManager.Load
                 new RecyclerViewItemClickListener(con, new RecyclerViewItemClickListener.OnItemClickListener() {
                     @Override
                     public void onItemClick(View view, int position) {
-                        ((ShowMovieDetailCallback)con).onItemSelected(adapter.getMovieId(position));
+                        ((ShowMovieDetailCallback) con).onItemSelected(false, adapter.getMovieId(position));
                     }
                 })
         );
@@ -192,21 +190,32 @@ public class MainActivityFragment extends Fragment implements LoaderManager.Load
                         showErrorText("");
                     }
                     loadAdapterWithData(data);
+                    sendMovieIdToInterface(data);
                 }
                 break;
             case LOADER_MY_FAVOURITE_MOVIES:
                 hideLoading();
                 if (sortBy == Constants.ROW_MY_FAVOURITES) {
-                    if (data.getCount() > 0) {
-                        showErrorText("");
-                    } else {
+                    if (data.getCount() == 0) {
                         showErrorText(getString(R.string.error_no_favourite_movies_found));
+                    } else {
+                        showErrorText("");
                     }
                     loadAdapterWithData(data);
+                    sendMovieIdToInterface(data);
                 }
             default:
                 break;
         }
+    }
+
+    private void sendMovieIdToInterface(Cursor data) {
+        int id = -1;
+        if (data != null && data.getCount() != 0) {
+            data.moveToFirst();
+            id = data.getInt(Constants.RV_COL_MSB_MOVIE_ID);
+        }
+        ((ShowMovieDetailCallback) con).onItemSelected(true, id);
     }
 
     @Override
@@ -215,7 +224,7 @@ public class MainActivityFragment extends Fragment implements LoaderManager.Load
     }
 
     public interface ShowMovieDetailCallback {
-        public void onItemSelected(int movieId);
+        public void onItemSelected(boolean dataFromFirstLoad, int movieId);
     }
 
 

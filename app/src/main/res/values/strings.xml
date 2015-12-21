@@ -1,4 +1,4 @@
-<resources>
+<resources xmlns:xliff="http://schemas.android.com/tools">
     <string name="app_name">Popular Movies</string>
     <string name="sort_by">Sort</string>
     <string name="dialog_sort_title">Sort by</string>
@@ -41,4 +41,7 @@
     <string name="removed_from_favourites">removed from favourites</string>
     <string name="added_to_favourites">added to favourites</string>
     <string name="error_no_favourite_movies_found">No favourite movies found</string>
+
+    <string name="share_video">Check out \'<xliff:g id="title">%1$s</xliff:g>\' on <xliff:g id="url">%2$s</xliff:g></string>
+    <string name="share_video_title">Share trailer</string>
 </resources>

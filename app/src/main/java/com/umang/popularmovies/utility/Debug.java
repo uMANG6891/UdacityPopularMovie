@@ -8,19 +8,19 @@ import android.util.Log;
 public class Debug {
     private static boolean allowPrinting = true;
 
-    public static void e(String tag, String value) {
+    public static void d(String tag, String value) {
         if (allowPrinting) {
             Log.e(tag, value);
         }
     }
 
-    public static void e(String tag, double value) {
+    public static void d(String tag, double value) {
         if (allowPrinting) {
             Log.e(tag, ":" + value + ":");
         }
     }
 
-    public static void e(String tag, boolean value) {
+    public static void d(String tag, boolean value) {
         if (allowPrinting) {
             Log.e(tag, ":" + value + ":");
         }

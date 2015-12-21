@@ -12,6 +12,9 @@ import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
@@ -81,6 +84,9 @@ public class DetailActivityFragment extends Fragment implements LoaderManager.Lo
     String LINK;
     boolean IS_FAVOURITE = false;
 
+    Menu menu;
+    MenuInflater inflater;
+
     private final int LOADER_MOVIE_DETAIL = 0;
     private final int LOADER_COMMENTS = 1;
     private final int LOADER_FAVOURITE = 2;
@@ -90,6 +96,8 @@ public class DetailActivityFragment extends Fragment implements LoaderManager.Lo
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         super.onCreateView(inflater, container, savedInstanceState);
         con = getActivity();
+
+        setHasOptionsMenu(true);
 
         View view = inflater.inflate(R.layout.fragment_detail, container, false);
         ButterKnife.bind(this, view);
@@ -162,11 +170,13 @@ public class DetailActivityFragment extends Fragment implements LoaderManager.Lo
                     if (data.getString(Constants.RV_COL_MSB_CAST) == null || data.getString(Constants.RV_COL_MSB_CAST).length() == 0) {
                         urls.add(Constants.buildGetMovieReview(MOVIE_ID));
                     }
-                    if (data.getString(Constants.RV_COL_MSB_VIDEO_LINK) == null || data.getString(Constants.RV_COL_MSB_VIDEO_LINK).length() == 0) {
+                    LINK = data.getString(Constants.RV_COL_MSB_VIDEO_LINK);
+                    if (LINK == null || LINK.length() == 0) {
                         urls.add(Constants.buildGetMovieVideoLink(MOVIE_ID));
                         rlVideoOverlay.setVisibility(View.GONE);
                     } else {
-                        LINK = data.getString(Constants.RV_COL_MSB_VIDEO_LINK);
+                        if (menu != null && inflater != null)
+                            onCreateOptionsMenu(menu, inflater);
                         rlVideoOverlay.setVisibility(View.VISIBLE);
                         rlVideoOverlay.setOnClickListener(this);
                     }
@@ -199,7 +209,7 @@ public class DetailActivityFragment extends Fragment implements LoaderManager.Lo
                         tvContent = (TextView) view.findViewById(R.id.item_r_content);
 
                         tvAuthor.setText(data.getString(Constants.RV_COL_CM_AUTHOR));
-                        tvContent.setText(data.getString(Constants.RV_COL_MCM_CONTENT));
+                        tvContent.setText(data.getString(Constants.RV_COL_CM_CONTENT));
                         llReviews.addView(view);
                     }
                 }
@@ -254,9 +264,33 @@ public class DetailActivityFragment extends Fragment implements LoaderManager.Lo
         }
     }
 
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        super.onCreateOptionsMenu(menu, inflater);
+        this.menu = menu;
+        this.inflater = inflater;
+        if (LINK != null && LINK != "")
+            inflater.inflate(R.menu.menu_detail, menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        super.onOptionsItemSelected(item);
+        switch (item.getItemId()) {
+            case android.R.id.home:
+                con.finish();
+                return true;
+            case R.id.menu_action_share:
+                Utility.shareYouTubeVideo(con, MOVIE_TITLE, LINK);
+                return true;
+            default:
+                return false;
+        }
+    }
 
     @Override
     public void onScrollChanged(int scrollY, boolean firstScroll, boolean dragging) {
+        ((AnimateToolbar) con).onScroll(scrollY);
         ivBackdrop.setTranslationY(scrollY / 2);
         rlVideoOverlay.setTranslationY(scrollY / 2);
     }

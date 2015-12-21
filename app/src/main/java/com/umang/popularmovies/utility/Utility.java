@@ -1,8 +1,15 @@
 package com.umang.popularmovies.utility;
 
 import android.app.Activity;
+import android.content.ActivityNotFoundException;
+import android.content.Context;
+import android.content.Intent;
 import android.graphics.Point;
+import android.net.Uri;
+import android.support.v4.app.ShareCompat;
 import android.view.Display;
+
+import com.umang.popularmovies.R;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -42,4 +49,21 @@ public class Utility {
         return sdfYear.format(date);
     }
 
+    public static void shareYouTubeVideo(Context con,String movieName, String youtubeId) {
+        try {
+            Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse("vnd.youtube:" + youtubeId));
+            con.startActivity(intent);
+        } catch (ActivityNotFoundException ex) {
+            Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(Constants.YOUTUBE_BASE + youtubeId));
+            con.startActivity(intent);
+        }
+        con.startActivity(Intent.createChooser(createShareIntent(con, movieName, youtubeId), con.getString(R.string.share_video_title)));
+    }
+
+    public static Intent createShareIntent(Context con, String title, String key) {
+        ShareCompat.IntentBuilder builder = ShareCompat.IntentBuilder.from((Activity) con)
+                .setType("text/plain")
+                .setText(con.getString(R.string.share_video, title, Constants.YOUTUBE_BASE + key));
+        return builder.getIntent();
+    }
 }

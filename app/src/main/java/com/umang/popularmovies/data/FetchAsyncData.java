@@ -163,7 +163,7 @@ public class FetchAsyncData extends AsyncTask<List, Void, Void> {
     }
 
     public static String getFromInternet(String MOVIE_URL) {
-        Debug.e("url", MOVIE_URL);
+        Debug.d("url", MOVIE_URL);
         HttpURLConnection urlConnection = null;
         BufferedReader reader = null;
 
