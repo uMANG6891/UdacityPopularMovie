@@ -44,4 +44,5 @@
 
     <string name="share_video">Check out \'<xliff:g id="title">%1$s</xliff:g>\' on <xliff:g id="url">%2$s</xliff:g></string>
     <string name="share_video_title">Share trailer</string>
+    <string name="refreshing">Refreshing…</string>
 </resources>

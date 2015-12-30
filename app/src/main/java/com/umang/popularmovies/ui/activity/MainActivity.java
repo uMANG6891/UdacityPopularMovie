@@ -54,6 +54,7 @@ public class MainActivity extends AppCompatActivity implements ShowMovieDetailCa
             if (!dataFromFirstLoad) { // data from first load comes when updating detail fragment in two pane mode
                 Intent i = new Intent(this, DetailActivity.class);
                 i.putExtra(Constants.EXTRA_MOVIE_ID, movieId);
+                i.putExtra(Constants.EXTRA_IS_TWO_PANE, isTwoPaneLayout);
                 startActivity(i);
             }
         }
@@ -71,6 +72,7 @@ public class MainActivity extends AppCompatActivity implements ShowMovieDetailCa
                     DetailActivityFragment fragDetail = new DetailActivityFragment();
                     Bundle b = new Bundle();
                     b.putInt(Constants.EXTRA_MOVIE_ID, msg.arg1);
+                    b.putBoolean(Constants.EXTRA_IS_TWO_PANE, isTwoPaneLayout);
 
                     fragDetail.setArguments(b);
                     findViewById(R.id.fragment_detail).setVisibility(View.VISIBLE);

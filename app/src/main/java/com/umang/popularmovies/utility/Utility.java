@@ -1,7 +1,6 @@
 package com.umang.popularmovies.utility;
 
 import android.app.Activity;
-import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Point;
@@ -49,14 +48,7 @@ public class Utility {
         return sdfYear.format(date);
     }
 
-    public static void shareYouTubeVideo(Context con,String movieName, String youtubeId) {
-        try {
-            Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse("vnd.youtube:" + youtubeId));
-            con.startActivity(intent);
-        } catch (ActivityNotFoundException ex) {
-            Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(Constants.YOUTUBE_BASE + youtubeId));
-            con.startActivity(intent);
-        }
+    public static void shareYouTubeVideo(Context con, String movieName, String youtubeId) {
         con.startActivity(Intent.createChooser(createShareIntent(con, movieName, youtubeId), con.getString(R.string.share_video_title)));
     }
 

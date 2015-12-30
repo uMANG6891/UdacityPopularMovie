@@ -10,6 +10,7 @@ import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -20,6 +21,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.umang.popularmovies.Application;
 import com.umang.popularmovies.R;
@@ -36,7 +38,7 @@ import butterknife.ButterKnife;
 /**
  * A placeholder fragment containing a simple view.
  */
-public class MainActivityFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
+public class MainActivityFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor>, SwipeRefreshLayout.OnRefreshListener {
 
     FragmentActivity con;
 
@@ -46,6 +48,8 @@ public class MainActivityFragment extends Fragment implements LoaderManager.Load
     ProgressBar pbLoading;
     @Bind(R.id.main_tv_error_text)
     TextView tvErrorInfo;
+    @Bind(R.id.main_srl_refresh)
+    SwipeRefreshLayout swipeRefreshLayout;
 
     SharedPreferences.Editor editor;
     AdapterPosters adapter;
@@ -75,6 +79,7 @@ public class MainActivityFragment extends Fragment implements LoaderManager.Load
                     }
                 })
         );
+        swipeRefreshLayout.setOnRefreshListener(this);
         sortItems = getResources().getStringArray(R.array.sort_by_array);
         loadMovieData();
         showLoading();
@@ -87,8 +92,10 @@ public class MainActivityFragment extends Fragment implements LoaderManager.Load
         int t = Application.sp.getInt(Constants.SP_SORT_BY, 0);
         con.setTitle(sortItems[Application.sp.getInt(Constants.SP_SORT_BY, 0)]);
         if (t >= 0 && t <= 1) {
+            swipeRefreshLayout.setEnabled(true);
             getLoaderManager().restartLoader(LOADER_COLLECTION_MOVIES, null, MainActivityFragment.this);
         } else {
+            swipeRefreshLayout.setEnabled(false);
             getLoaderManager().restartLoader(LOADER_MY_FAVOURITE_MOVIES, null, MainActivityFragment.this);
         }
         showLoading();
@@ -184,7 +191,8 @@ public class MainActivityFragment extends Fragment implements LoaderManager.Load
                 hideLoading();
                 if (sortBy >= Constants.ROW_POPULAR && sortBy <= Constants.ROW_HIGHEST_RATED) {
                     if (data.getCount() == 0) {
-                        MovieSyncAdapter.syncImmediately(getActivity(), MovieSyncAdapter.SYNC_BOTH);
+                        MovieSyncAdapter.build(con)
+                                .syncImmediately(getActivity(), MovieSyncAdapter.SYNC_BOTH);
                         showErrorText(getString(R.string.error_getting_data));
                     } else {
                         showErrorText("");
@@ -221,6 +229,20 @@ public class MainActivityFragment extends Fragment implements LoaderManager.Load
     @Override
     public void onLoaderReset(Loader<Cursor> loader) {
 
+    }
+
+    @Override
+    public void onRefresh() {
+        MovieSyncAdapter.build(con)
+                .syncImmediately(getActivity(),
+                        MovieSyncAdapter.SYNC_BOTH,
+                        new MovieSyncAdapter.SyncMovies() {
+                            @Override
+                            public void onSyncComplete() {
+                                swipeRefreshLayout.setRefreshing(false);
+                                Toast.makeText(con, getString(R.string.refreshing), Toast.LENGTH_SHORT).show();
+                            }
+                        });
     }
 
     public interface ShowMovieDetailCallback {

@@ -42,6 +42,8 @@ public class MovieSyncAdapter extends AbstractThreadedSyncAdapter {
     private static final long DAY_IN_MILLIS = 1000 * 60 * 60 * 24;
     private static final int MOVIE_NOTIFICATION_ID = 10001;
 
+    private SyncMovies callback;
+
     public MovieSyncAdapter(Context context, boolean autoInitialize) {
         super(context, autoInitialize);
     }
@@ -155,7 +157,23 @@ public class MovieSyncAdapter extends AbstractThreadedSyncAdapter {
         }
     }
 
-    public static void syncImmediately(Context context, int sync) {
+    public static MovieSyncAdapter build(Context context) {
+        MovieSyncAdapter movieSyncAdapter = new MovieSyncAdapter(context, true);
+        return movieSyncAdapter;
+    }
+
+    public void syncImmediately(Context context, int sync) {
+        callback = null;
+        makeSync(context, sync);
+    }
+
+    public void syncImmediately(Context context, int sync, SyncMovies callback) {
+        this.callback = callback;
+        makeSync(context, sync);
+        callback.onSyncComplete();
+    }
+
+    private static void makeSync(Context context, int sync) {
         Bundle bundle = new Bundle();
         bundle.putBoolean(ContentResolver.SYNC_EXTRAS_EXPEDITED, true);
         bundle.putBoolean(ContentResolver.SYNC_EXTRAS_MANUAL, true);
@@ -182,10 +200,14 @@ public class MovieSyncAdapter extends AbstractThreadedSyncAdapter {
     private static void onAccountCreated(Account newAccount, Context context) {
         MovieSyncAdapter.configurePeriodicSync(context, SYNC_INTERVAL, SYNC_FLEXTIME);
         ContentResolver.setSyncAutomatically(newAccount, context.getString(R.string.content_authority), true);
-        syncImmediately(context, SYNC_BOTH);
+        MovieSyncAdapter.build(context).syncImmediately(context, SYNC_BOTH);
     }
 
 //    public static void initializeSyncAdapter(Context context) {
 //        getSyncAccount(context);
 //    }
+
+    public interface SyncMovies {
+        void onSyncComplete();
+    }
 }

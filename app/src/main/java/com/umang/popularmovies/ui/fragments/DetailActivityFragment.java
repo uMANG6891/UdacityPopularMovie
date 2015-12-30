@@ -80,6 +80,7 @@ public class DetailActivityFragment extends Fragment implements LoaderManager.Lo
 
 
     int MOVIE_ID;
+    boolean IS_TWO_PANE_LAYOUT;
     String MOVIE_TITLE;
     String LINK;
     boolean IS_FAVOURITE = false;
@@ -108,6 +109,7 @@ public class DetailActivityFragment extends Fragment implements LoaderManager.Lo
 
         if (getArguments() != null) {
             MOVIE_ID = getArguments().getInt(Constants.EXTRA_MOVIE_ID, -1);
+            IS_TWO_PANE_LAYOUT = getArguments().getBoolean(Constants.EXTRA_IS_TWO_PANE, false);
             if (MOVIE_ID != -1) {
                 getLoaderManager().initLoader(LOADER_MOVIE_DETAIL, null, this);
                 getLoaderManager().initLoader(LOADER_COMMENTS, null, this);
@@ -269,8 +271,13 @@ public class DetailActivityFragment extends Fragment implements LoaderManager.Lo
         super.onCreateOptionsMenu(menu, inflater);
         this.menu = menu;
         this.inflater = inflater;
-        if (LINK != null && LINK != "")
+        menu.clear();
+        if (LINK != null && LINK != "") {
+            if (IS_TWO_PANE_LAYOUT) {
+                inflater.inflate(R.menu.menu_main, menu);
+            }
             inflater.inflate(R.menu.menu_detail, menu);
+        }
     }
 
     @Override

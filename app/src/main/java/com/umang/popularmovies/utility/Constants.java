@@ -35,6 +35,8 @@ public class Constants {
     // extras passed between activities and fragments
 
     public static final String EXTRA_MOVIE_ID = "extra_movie_data";
+    public static final String EXTRA_IS_TWO_PANE = "extra_is_two_pane";
+
     public static String buildGetMovieReview(int MOVIE_ID) {
         return BASE_MOVIE_DB_URL + "movie/" + MOVIE_ID + "/credits?api_key=" + MOVIE_DB_API_KEY;
     }
