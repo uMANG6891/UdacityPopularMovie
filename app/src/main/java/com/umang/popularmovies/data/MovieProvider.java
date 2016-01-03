@@ -169,6 +169,18 @@ public class MovieProvider extends ContentProvider {
             case COLLECTION_SAVED_FOR:
                 retCursor = getMovieBySavedFor(uri, projection, sortOrder);
                 break;
+            // "collection/"
+            case COLLECTION:
+                retCursor = mOpenHelper.getReadableDatabase().query(
+                        CollectionEntry.TABLE_NAME,
+                        projection,
+                        selection,
+                        selectionArgs,
+                        null,
+                        null,
+                        sortOrder
+                );
+                break;
 
             // "movie/#"
             case MOVIE_ONE:

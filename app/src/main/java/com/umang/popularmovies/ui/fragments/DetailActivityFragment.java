@@ -283,6 +283,8 @@ public class DetailActivityFragment extends Fragment implements LoaderManager.Lo
         }
         if (LINK != null && LINK != "") {
             inflater.inflate(R.menu.menu_detail, menu);
+            MenuItem item = menu.findItem(R.id.menu_action_share);
+            item.setTitle(getString(R.string.share_video_title, MOVIE_TITLE));
         }
     }
 

@@ -1,6 +1,8 @@
 package com.umang.popularmovies.utility;
 
+import com.umang.popularmovies.data.MovieContract.CollectionEntry;
 import com.umang.popularmovies.data.MovieContract.CommentEntry;
+import com.umang.popularmovies.data.MovieContract.FavouriteEntry;
 import com.umang.popularmovies.data.MovieContract.MovieEntry;
 
 /**
@@ -62,6 +64,23 @@ public class Constants {
         public static final String VOTE_AVERAGE = "vote_average";
         public static final String VOTE_COUNT = "vote_count";
     }
+
+
+    // projections to get movie id from favourites table
+    public static final String[] FAVOURITE_PROJECTION_COLS = {
+            FavouriteEntry.TABLE_NAME + "." + FavouriteEntry.COLUMN_MOVIE_ID
+    };
+
+    public static final int FAV_COL_MOVIE_ID = 0;
+
+
+    // projections to get movie id from collection table
+    public static final String[] COLLECTION_PROJECTION_COLS = {
+            CollectionEntry.TABLE_NAME + "." + CollectionEntry.COLUMN_MOVIE_ID
+    };
+
+    public static final int COLL_COL_MOVIE_ID = 0;
+
 
     // projections to get movie by saved_by
     public static final String[] MOVIE_PROJECTION_COLS = {

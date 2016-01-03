@@ -9,6 +9,7 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.content.SyncRequest;
 import android.content.SyncResult;
+import android.database.Cursor;
 import android.os.Build;
 import android.os.Bundle;
 
@@ -16,6 +17,7 @@ import com.umang.popularmovies.R;
 import com.umang.popularmovies.data.FetchAsyncData;
 import com.umang.popularmovies.data.MovieContract;
 import com.umang.popularmovies.data.MovieContract.CollectionEntry;
+import com.umang.popularmovies.data.MovieContract.FavouriteEntry;
 import com.umang.popularmovies.data.MovieContract.MovieEntry;
 import com.umang.popularmovies.utility.Constants;
 
@@ -23,6 +25,8 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Vector;
 
 /**
@@ -71,12 +75,54 @@ public class MovieSyncAdapter extends AbstractThreadedSyncAdapter {
                 }
             }
         }
+
+        removeUnwantedMovieDetailsFromMovieEntryTable();
+    }
+
+    private void removeUnwantedMovieDetailsFromMovieEntryTable() {
+        // getting all movie ids that exists in favourite and collection table
+        List<Integer> MOVIE_IDS = new ArrayList<>();
+        Cursor c = getContext().getContentResolver().query(FavouriteEntry.CONTENT_URI, Constants.FAVOURITE_PROJECTION_COLS, null, null, null);
+        if (c != null) {
+            for (c.moveToFirst(); !c.isAfterLast(); c.moveToNext()) {
+                MOVIE_IDS.add(c.getInt(Constants.FAV_COL_MOVIE_ID));
+            }
+            c.close();
+        }
+        c = getContext().getContentResolver().query(CollectionEntry.CONTENT_URI, Constants.COLLECTION_PROJECTION_COLS, null, null, null);
+        if (c != null) {
+            for (c.moveToFirst(); !c.isAfterLast(); c.moveToNext()) {
+                MOVIE_IDS.add(c.getInt(Constants.COLL_COL_MOVIE_ID));
+            }
+            c.close();
+        }
+
+        // Now remove all entries that doesn't exists in any table
+        StringBuilder inQuery = new StringBuilder();
+
+        inQuery.append("(");
+        boolean first = true;
+        for (int id : MOVIE_IDS) {
+            if (first) {
+                first = false;
+                inQuery.append("'").append(id).append("'");
+            } else {
+                inQuery.append(", '").append(id).append("'");
+            }
+        }
+        inQuery.append(")");
+        getContext().getContentResolver().delete(
+                MovieEntry.CONTENT_URI,
+                MovieEntry.COLUMN_MOVIE_ID + " NOT IN " + inQuery.toString(),
+                null);
     }
 
     private String getMovieUrl(int movieType) {
-        return Constants.BASE_MOVIE_DB_URL + "discover/movie?sort_by="
+        return Constants.BASE_MOVIE_DB_URL
+                + "discover/movie?sort_by="
                 + Constants.MOVIE_URL[movieType]
-                + "&api_key=" + Constants.MOVIE_DB_API_KEY;
+                + "&api_key="
+                + Constants.MOVIE_DB_API_KEY;
     }
 
 
@@ -124,6 +170,7 @@ public class MovieSyncAdapter extends AbstractThreadedSyncAdapter {
                 cvArray = new ContentValues[cvvCollection.size()];
                 cvvCollection.toArray(cvArray);
                 getContext().getContentResolver().bulkInsert(CollectionEntry.CONTENT_URI, cvArray);
+
             }
         } catch (JSONException e) {
             e.printStackTrace();
