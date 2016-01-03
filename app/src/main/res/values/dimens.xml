@@ -5,17 +5,14 @@
     <dimen name="fab_margin">16dp</dimen>
     <dimen name="toolbar_elevation">2dp</dimen>
 
-    <dimen name="translucent_toolbar_padding_top">0dp</dimen>
-
     <!-- Poster size-->
     <dimen name="poster_width">185dp</dimen>
     <dimen name="poster_height">278dp</dimen>
     <dimen name="poster_small_width">111dp</dimen>
     <dimen name="poster_small_height">167dp</dimen>
     <!-- Backdrop size-->
-    <dimen name="backdrop_width">342dp</dimen>
-    <dimen name="backdrop_height">192dp</dimen>
-    <dimen name="backdrop_height_below_layout">176dp</dimen>
+    <dimen name="backdrop_height">240dp</dimen>
+    <dimen name="backdrop_height_below_layout">224dp</dimen>
 
     <!--integer values-->
     <integer name="main_grid_columns">2</integer>

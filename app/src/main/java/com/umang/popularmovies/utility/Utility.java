@@ -4,7 +4,6 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Point;
-import android.net.Uri;
 import android.support.v4.app.ShareCompat;
 import android.view.Display;
 
@@ -49,7 +48,7 @@ public class Utility {
     }
 
     public static void shareYouTubeVideo(Context con, String movieName, String youtubeId) {
-        con.startActivity(Intent.createChooser(createShareIntent(con, movieName, youtubeId), con.getString(R.string.share_video_title)));
+        con.startActivity(Intent.createChooser(createShareIntent(con, movieName, youtubeId), con.getString(R.string.share_video_title, movieName)));
     }
 
     public static Intent createShareIntent(Context con, String title, String key) {

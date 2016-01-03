@@ -75,7 +75,7 @@ public class MainActivityFragment extends Fragment implements LoaderManager.Load
                 new RecyclerViewItemClickListener(con, new RecyclerViewItemClickListener.OnItemClickListener() {
                     @Override
                     public void onItemClick(View view, int position) {
-                        ((ShowMovieDetailCallback) con).onItemSelected(false, adapter.getMovieId(position));
+                        ((ShowMovieDetailCallback) con).onMovieItemSelected(false, adapter.getMovieId(position));
                     }
                 })
         );
@@ -223,7 +223,7 @@ public class MainActivityFragment extends Fragment implements LoaderManager.Load
             data.moveToFirst();
             id = data.getInt(Constants.RV_COL_MSB_MOVIE_ID);
         }
-        ((ShowMovieDetailCallback) con).onItemSelected(true, id);
+        ((ShowMovieDetailCallback) con).onMovieItemSelected(true, id);
     }
 
     @Override
@@ -246,7 +246,7 @@ public class MainActivityFragment extends Fragment implements LoaderManager.Load
     }
 
     public interface ShowMovieDetailCallback {
-        public void onItemSelected(boolean dataFromFirstLoad, int movieId);
+        void onMovieItemSelected(boolean dataFromFirstLoad, int movieId);
     }
 
 

@@ -155,10 +155,11 @@ public class FetchAsyncData extends AsyncTask<List, Void, Void> {
                 values.put(MovieEntry.COLUMN_CAST, CAST.toString());
             if (LINK != null)
                 values.put(MovieEntry.COLUMN_VIDEO_LINK, LINK);
-            con.getContentResolver().update(MovieEntry.CONTENT_URI,
-                    values,
-                    MovieContract.MovieEntry.COLUMN_MOVIE_ID + " = ?",
-                    new String[]{movieId});
+            if (values.size() > 0)
+                con.getContentResolver().update(MovieEntry.CONTENT_URI,
+                        values,
+                        MovieContract.MovieEntry.COLUMN_MOVIE_ID + " = ?",
+                        new String[]{movieId});
         }
     }
 

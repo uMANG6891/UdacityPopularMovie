@@ -69,6 +69,9 @@ public class DetailActivityFragment extends Fragment implements LoaderManager.Lo
     ImageView ivPoster;
     @Bind(R.id.frag_d_iv_fav_movie)
     ImageView ivFavMovie;
+
+    @Bind(R.id.frag_d_tv_movie_name)
+    TextView tvMovieName;
     @Bind(R.id.frag_d_tv_release_date)
     TextView tvReleaseDate;
     @Bind(R.id.frag_d_tv_votes)
@@ -84,6 +87,7 @@ public class DetailActivityFragment extends Fragment implements LoaderManager.Lo
     String MOVIE_TITLE;
     String LINK;
     boolean IS_FAVOURITE = false;
+
 
     Menu menu;
     MenuInflater inflater;
@@ -163,6 +167,8 @@ public class DetailActivityFragment extends Fragment implements LoaderManager.Lo
                     MOVIE_TITLE = data.getString(Constants.RV_COL_MSB_TITLE);
                     Picasso.with(con).load(Constants.BASE_IMAGE_URL + Constants.BACKDROP_SIZE + data.getString(Constants.RV_COL_MSB_BACKDROP_PATH)).into(ivBackdrop);
                     Picasso.with(con).load(Constants.BASE_IMAGE_URL + Constants.BACKDROP_SIZE + data.getString(Constants.RV_COL_MSB_POSTER_PATH)).into(ivPoster);
+                    tvMovieName.setText(MOVIE_TITLE);
+                    ((MovieTitle) con).getMovieTitle(MOVIE_TITLE);
                     tvReleaseDate.setText(Utility.getYear(data.getString(Constants.RV_COL_MSB_RELEASE_DATE)));
                     tvVotes.setText(data.getString(Constants.RV_COL_MSB_VOTE_COUNT).concat(" "));
                     tvRating.setText(data.getString(Constants.RV_COL_MSB_VOTE_AVERAGE));
@@ -272,10 +278,10 @@ public class DetailActivityFragment extends Fragment implements LoaderManager.Lo
         this.menu = menu;
         this.inflater = inflater;
         menu.clear();
+        if (IS_TWO_PANE_LAYOUT) {
+            inflater.inflate(R.menu.menu_main, menu);
+        }
         if (LINK != null && LINK != "") {
-            if (IS_TWO_PANE_LAYOUT) {
-                inflater.inflate(R.menu.menu_main, menu);
-            }
             inflater.inflate(R.menu.menu_detail, menu);
         }
     }
@@ -298,6 +304,7 @@ public class DetailActivityFragment extends Fragment implements LoaderManager.Lo
     @Override
     public void onScrollChanged(int scrollY, boolean firstScroll, boolean dragging) {
         ((AnimateToolbar) con).onScroll(scrollY);
+
         ivBackdrop.setTranslationY(scrollY / 2);
         rlVideoOverlay.setTranslationY(scrollY / 2);
     }
@@ -313,6 +320,10 @@ public class DetailActivityFragment extends Fragment implements LoaderManager.Lo
     }
 
     public interface AnimateToolbar {
-        public void onScroll(int scrollY);
+        void onScroll(int scrollY);
+    }
+
+    public interface MovieTitle {
+        void getMovieTitle(String title);
     }
 }

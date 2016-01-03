@@ -7,11 +7,13 @@ import android.support.v4.content.ContextCompat;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.widget.TextView;
 
 import com.github.ksoichiro.android.observablescrollview.ScrollUtils;
 import com.umang.popularmovies.R;
 import com.umang.popularmovies.ui.fragments.DetailActivityFragment;
 import com.umang.popularmovies.ui.fragments.DetailActivityFragment.AnimateToolbar;
+import com.umang.popularmovies.ui.fragments.DetailActivityFragment.MovieTitle;
 import com.umang.popularmovies.utility.Constants;
 
 import butterknife.Bind;
@@ -20,12 +22,15 @@ import butterknife.ButterKnife;
 /**
  * Created by umang on 21/11/15.
  */
-public class DetailActivity extends AppCompatActivity implements AnimateToolbar {
+public class DetailActivity extends AppCompatActivity implements AnimateToolbar, MovieTitle {
 
     @Bind(R.id.frag_d_abl_appbar)
     AppBarLayout appbar;
     @Bind(R.id.frag_d_tb_toolbar)
     Toolbar toolbar;
+
+    @Bind(R.id.frag_d_tb_toolbar_title)
+    TextView tvToolbarTitle;
 
     int mParallaxImageHeight;
 
@@ -42,6 +47,7 @@ public class DetailActivity extends AppCompatActivity implements AnimateToolbar 
             actionBar.setDisplayHomeAsUpEnabled(true);
             actionBar.setHomeButtonEnabled(true);
         }
+
         mParallaxImageHeight = getResources().getDimensionPixelSize(R.dimen.backdrop_height);
 
         if (savedInstanceState == null) {
@@ -65,5 +71,11 @@ public class DetailActivity extends AppCompatActivity implements AnimateToolbar 
         int baseColor = ContextCompat.getColor(this, R.color.colorPrimary);
         float alpha = Math.min(1, (float) scrollY / mParallaxImageHeight);
         appbar.setBackgroundColor(ScrollUtils.getColorWithAlpha(alpha, baseColor));
+        tvToolbarTitle.setAlpha(alpha);
+    }
+
+    @Override
+    public void getMovieTitle(String title) {
+        tvToolbarTitle.setText(title);
     }
 }

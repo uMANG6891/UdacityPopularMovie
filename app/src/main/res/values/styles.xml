@@ -14,10 +14,6 @@
         <item name="windowNoTitle">true</item>
     </style>
 
-    <style name="AppTheme.NoActionBar.Translucent" parent="AppTheme.NoActionBar">
-        <item name="android:windowTranslucentStatus" tools:targetApi="kitkat">true</item>
-    </style>
-
     <!--CardView-->
     <style name="CardViewDefault">
         <item name="android:layout_width">match_parent</item>

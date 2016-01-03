@@ -24,6 +24,8 @@ public class MainActivity extends AppCompatActivity implements ShowMovieDetailCa
 
     boolean isTwoPaneLayout = false;
 
+    private int LAST_MOVIE_LOADED = -1;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -33,23 +35,19 @@ public class MainActivity extends AppCompatActivity implements ShowMovieDetailCa
         setSupportActionBar(toolbar);
         if (findViewById(R.id.fragment_detail) != null) {
             isTwoPaneLayout = true;
-            if (savedInstanceState == null) {
-//                DetailActivityFragment fragDetail = new DetailActivityFragment();
-//                getSupportFragmentManager()
-//                        .beginTransaction()
-//                        .add(R.id.fragment_detail, fragDetail)
-//                        .commit();
-            }
         }
     }
 
     @Override
-    public void onItemSelected(boolean dataFromFirstLoad, int movieId) {
+    public void onMovieItemSelected(boolean dataFromFirstLoad, int movieId) {
         if (isTwoPaneLayout) {
-            Message msg = new Message();
-            msg.what = WHAT;
-            msg.arg1 = movieId;
-            handler.sendMessage(msg);
+            if (LAST_MOVIE_LOADED != movieId) {
+                LAST_MOVIE_LOADED = movieId;
+                Message msg = new Message();
+                msg.what = WHAT;
+                msg.arg1 = movieId;
+                handler.sendMessage(msg);
+            }
         } else {
             if (!dataFromFirstLoad) { // data from first load comes when updating detail fragment in two pane mode
                 Intent i = new Intent(this, DetailActivity.class);
@@ -78,7 +76,7 @@ public class MainActivity extends AppCompatActivity implements ShowMovieDetailCa
                     findViewById(R.id.fragment_detail).setVisibility(View.VISIBLE);
                     getSupportFragmentManager()
                             .beginTransaction()
-                            .add(R.id.fragment_detail, fragDetail)
+                            .replace(R.id.fragment_detail, fragDetail)
                             .commit();
                 }
             }
