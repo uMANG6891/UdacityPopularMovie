@@ -10,19 +10,19 @@ public class Debug {
 
     public static void d(String tag, String value) {
         if (allowPrinting) {
-            Log.e(tag, value);
+            Log.d(tag, value);
         }
     }
 
     public static void d(String tag, double value) {
         if (allowPrinting) {
-            Log.e(tag, ":" + value + ":");
+            Log.d(tag, ":" + value + ":");
         }
     }
 
     public static void d(String tag, boolean value) {
         if (allowPrinting) {
-            Log.e(tag, ":" + value + ":");
+            Log.d(tag, ":" + value + ":");
         }
     }
 

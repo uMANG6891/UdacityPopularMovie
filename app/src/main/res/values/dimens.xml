@@ -10,8 +10,10 @@
     <dimen name="poster_height">278dp</dimen>
     <dimen name="poster_small_width">111dp</dimen>
     <dimen name="poster_small_height">167dp</dimen>
+
     <!-- Backdrop size-->
     <dimen name="backdrop_height">240dp</dimen>
+    <dimen name="backdrop_height_click">240dp</dimen>
     <dimen name="backdrop_height_below_layout">224dp</dimen>
 
     <!--integer values-->

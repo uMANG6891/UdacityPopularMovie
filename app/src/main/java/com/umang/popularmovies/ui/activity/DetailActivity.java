@@ -33,6 +33,7 @@ public class DetailActivity extends AppCompatActivity implements AnimateToolbar,
     TextView tvToolbarTitle;
 
     int mParallaxImageHeight;
+    int PRIMARY_COLOR;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -40,6 +41,8 @@ public class DetailActivity extends AppCompatActivity implements AnimateToolbar,
         setContentView(R.layout.activity_detail);
         ButterKnife.bind(this);
         setTitle("");
+
+        PRIMARY_COLOR = ContextCompat.getColor(this, R.color.colorPrimary);
 
         setSupportActionBar(toolbar);
         ActionBar actionBar = getSupportActionBar();
@@ -68,9 +71,8 @@ public class DetailActivity extends AppCompatActivity implements AnimateToolbar,
 
     @Override
     public void onScroll(int scrollY) {
-        int baseColor = ContextCompat.getColor(this, R.color.colorPrimary);
         float alpha = Math.min(1, (float) scrollY / mParallaxImageHeight);
-        appbar.setBackgroundColor(ScrollUtils.getColorWithAlpha(alpha, baseColor));
+        appbar.setBackgroundColor(ScrollUtils.getColorWithAlpha(alpha, PRIMARY_COLOR));
         tvToolbarTitle.setAlpha(alpha);
     }
 

@@ -1,0 +1,7 @@
+<resources>
+    <!-- Applied only for phones with <sw600dp -->
+    <dimen name="backdrop_height">300dp</dimen>
+    <dimen name="backdrop_height_click">164dp</dimen>
+    <dimen name="backdrop_height_below_layout">164dp</dimen>
+
+</resources>

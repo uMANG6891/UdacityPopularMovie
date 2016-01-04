@@ -18,30 +18,33 @@
                 android:id="@+id/item_mg_iv_movie_poster"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:minHeight="@dimen/poster_height"
                 android:layout_alignParentLeft="true"
                 android:layout_alignParentStart="true"
                 android:layout_alignParentTop="true"
                 android:adjustViewBounds="true"
+                android:minHeight="@dimen/poster_height"
                 android:scaleType="centerCrop" />
         </RelativeLayout>
 
         <LinearLayout
+            android:id="@+id/item_mg_ll_palette_background"
             android:layout_width="match_parent"
             android:layout_height="?android:attr/listPreferredItemHeight"
             android:gravity="center_vertical"
             android:orientation="vertical"
             android:paddingEnd="@dimen/activity_horizontal_margin"
+            android:background="@color/colorAccent"
             android:paddingLeft="@dimen/activity_horizontal_margin"
             android:paddingRight="@dimen/activity_horizontal_margin"
             android:paddingStart="@dimen/activity_horizontal_margin">
 
             <TextView
                 android:id="@+id/item_mg_tv_movie_name"
-                style="@style/Base.TextAppearance.AppCompat.Small"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:singleLine="true" />
+                android:singleLine="true"
+                android:textAppearance="@style/TextAppearance.AppCompat.Subhead"
+                android:textColor="#FFF" />
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -50,15 +53,17 @@
 
                 <TextView
                     android:id="@+id/item_mg_tv_movie_rating"
-                    style="@style/Base.TextAppearance.AppCompat.Small"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content" />
-
-                <TextView
-                    style="@style/Base.TextAppearance.AppCompat.Small"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="@string/out_of_name" />
+                    android:textAppearance="@style/TextAppearance.AppCompat.Body2"
+                    android:textColor="#FFF" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/out_of_name"
+                    android:textAppearance="@style/TextAppearance.AppCompat.Caption"
+                    android:textColor="#FFF" />
             </LinearLayout>
         </LinearLayout>
     </LinearLayout>

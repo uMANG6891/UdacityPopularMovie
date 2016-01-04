@@ -1,3 +1,4 @@
 <resources>
     <item name="ic_action_close" type="drawable">@android:drawable/ic_menu_close_clear_cancel</item>
+    <item name="ic_action_play" type="drawable">@android:drawable/ic_media_play</item>
 </resources>

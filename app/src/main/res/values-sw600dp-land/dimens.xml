@@ -1,0 +1,6 @@
+<resources>
+    <!-- Repeating these values from normal values-->
+    <dimen name="backdrop_height">240dp</dimen>
+    <dimen name="backdrop_height_click">240dp</dimen>
+    <dimen name="backdrop_height_below_layout">224dp</dimen>
+</resources>

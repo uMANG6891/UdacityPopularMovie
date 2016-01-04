@@ -23,10 +23,10 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.bumptech.glide.Glide;
 import com.github.ksoichiro.android.observablescrollview.ObservableScrollView;
 import com.github.ksoichiro.android.observablescrollview.ObservableScrollViewCallbacks;
 import com.github.ksoichiro.android.observablescrollview.ScrollState;
-import com.squareup.picasso.Picasso;
 import com.umang.popularmovies.R;
 import com.umang.popularmovies.data.FetchAsyncData;
 import com.umang.popularmovies.data.MovieContract;
@@ -35,7 +35,6 @@ import com.umang.popularmovies.data.MovieContract.FavouriteEntry;
 import com.umang.popularmovies.data.MovieContract.MovieEntry;
 import com.umang.popularmovies.ui.activity.MovieReadMoreActivity;
 import com.umang.popularmovies.utility.Constants;
-import com.umang.popularmovies.utility.Debug;
 import com.umang.popularmovies.utility.Utility;
 
 import java.util.ArrayList;
@@ -166,10 +165,11 @@ public class DetailActivityFragment extends Fragment implements LoaderManager.Lo
                 if (data.getCount() > 0) {
                     data.moveToFirst();
                     MOVIE_TITLE = data.getString(Constants.RV_COL_MSB_TITLE);
-                    Picasso.with(con).load(Constants.BASE_IMAGE_URL + Constants.BACKDROP_SIZE + data.getString(Constants.RV_COL_MSB_BACKDROP_PATH)).into(ivBackdrop);
-                    Picasso.with(con).load(Constants.BASE_IMAGE_URL + Constants.BACKDROP_SIZE + data.getString(Constants.RV_COL_MSB_POSTER_PATH)).into(ivPoster);
+                    Glide.with(con).load(Constants.BASE_IMAGE_URL + Constants.BACKDROP_SIZE + data.getString(Constants.RV_COL_MSB_BACKDROP_PATH)).into(ivBackdrop);
+                    Glide.with(con).load(Constants.BASE_IMAGE_URL + Constants.BACKDROP_SIZE + data.getString(Constants.RV_COL_MSB_POSTER_PATH)).into(ivPoster);
                     tvMovieName.setText(MOVIE_TITLE);
-                    ((MovieTitle) con).getMovieTitle(MOVIE_TITLE);
+                    if (!IS_TWO_PANE_LAYOUT)
+                        ((MovieTitle) con).getMovieTitle(MOVIE_TITLE);
                     tvReleaseDate.setText(Utility.getYear(data.getString(Constants.RV_COL_MSB_RELEASE_DATE)));
                     tvVotes.setText(data.getString(Constants.RV_COL_MSB_VOTE_COUNT).concat(" "));
                     tvRating.setText(Utility.parseRating(data.getString(Constants.RV_COL_MSB_VOTE_AVERAGE)));
@@ -181,8 +181,6 @@ public class DetailActivityFragment extends Fragment implements LoaderManager.Lo
                         urls.add(Constants.buildGetMovieReview(MOVIE_ID));
                     }
                     LINK = data.getString(Constants.RV_COL_MSB_VIDEO_LINK);
-                    Debug.d("cast", cast + ":");
-                    Debug.d("LINK", LINK + ":");
                     if (LINK == null || LINK.length() == 0) {
                         urls.add(Constants.buildGetMovieVideoLink(MOVIE_ID));
                         rlVideoOverlay.setVisibility(View.GONE);
@@ -197,7 +195,6 @@ public class DetailActivityFragment extends Fragment implements LoaderManager.Lo
                         FetchAsyncData task = new FetchAsyncData(con.getBaseContext());
                         task.execute(urls);
                     }
-//            ((DetailActivity) con).setActionBarTitle(row.get(MOVIE_JSON.TITLE)); // setting the title in the toolbar
                 }
                 break;
             case LOADER_COMMENTS:
