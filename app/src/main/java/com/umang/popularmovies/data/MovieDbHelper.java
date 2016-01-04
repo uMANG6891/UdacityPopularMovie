@@ -37,7 +37,7 @@ public class MovieDbHelper extends SQLiteOpenHelper {
                 MovieEntry.COLUMN_VIDEO_LINK + " TEXT NULL, " +
 
                 // To assure this table saves unique row for movie even with having entry in collection as saved_for 0 and 1
-                " UNIQUE (" + MovieEntry.COLUMN_MOVIE_ID + ") ON CONFLICT REPLACE);";
+                " UNIQUE (" + MovieEntry.COLUMN_MOVIE_ID + ") ON CONFLICT IGNORE);";
 
         final String SQL_CREATE_COLLECTION_TABLE = "CREATE TABLE " + CollectionEntry.TABLE_NAME + " (" +
                 CollectionEntry._ID + " INTEGER PRIMARY KEY AUTOINCREMENT," +
@@ -56,7 +56,7 @@ public class MovieDbHelper extends SQLiteOpenHelper {
                 " FOREIGN KEY (" + FavouriteEntry.COLUMN_MOVIE_ID + ") REFERENCES " +
                 MovieEntry.TABLE_NAME + " (" + MovieEntry.COLUMN_MOVIE_ID + ") " +
                 // To assure this table saves unique row for favourite movie entry
-                " UNIQUE (" + FavouriteEntry.COLUMN_MOVIE_ID + ") ON CONFLICT REPLACE);";
+                " UNIQUE (" + FavouriteEntry.COLUMN_MOVIE_ID + ") ON CONFLICT IGNORE);";
 
         final String SQL_CREATE_COMMENT_TABLE = "CREATE TABLE " + CommentEntry.TABLE_NAME + " (" +
                 CommentEntry._ID + " INTEGER PRIMARY KEY AUTOINCREMENT," +

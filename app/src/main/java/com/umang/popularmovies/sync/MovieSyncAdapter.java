@@ -46,7 +46,6 @@ public class MovieSyncAdapter extends AbstractThreadedSyncAdapter {
     private static final long DAY_IN_MILLIS = 1000 * 60 * 60 * 24;
     private static final int MOVIE_NOTIFICATION_ID = 10001;
 
-    private SyncMovies callback;
 
     public MovieSyncAdapter(Context context, boolean autoInitialize) {
         super(context, autoInitialize);
@@ -210,12 +209,10 @@ public class MovieSyncAdapter extends AbstractThreadedSyncAdapter {
     }
 
     public void syncImmediately(Context context, int sync) {
-        callback = null;
         makeSync(context, sync);
     }
 
     public void syncImmediately(Context context, int sync, SyncMovies callback) {
-        this.callback = callback;
         makeSync(context, sync);
         callback.onSyncComplete();
     }

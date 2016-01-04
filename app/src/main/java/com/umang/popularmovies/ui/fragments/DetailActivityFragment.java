@@ -35,6 +35,7 @@ import com.umang.popularmovies.data.MovieContract.FavouriteEntry;
 import com.umang.popularmovies.data.MovieContract.MovieEntry;
 import com.umang.popularmovies.ui.activity.MovieReadMoreActivity;
 import com.umang.popularmovies.utility.Constants;
+import com.umang.popularmovies.utility.Debug;
 import com.umang.popularmovies.utility.Utility;
 
 import java.util.ArrayList;
@@ -171,14 +172,17 @@ public class DetailActivityFragment extends Fragment implements LoaderManager.Lo
                     ((MovieTitle) con).getMovieTitle(MOVIE_TITLE);
                     tvReleaseDate.setText(Utility.getYear(data.getString(Constants.RV_COL_MSB_RELEASE_DATE)));
                     tvVotes.setText(data.getString(Constants.RV_COL_MSB_VOTE_COUNT).concat(" "));
-                    tvRating.setText(data.getString(Constants.RV_COL_MSB_VOTE_AVERAGE));
+                    tvRating.setText(Utility.parseRating(data.getString(Constants.RV_COL_MSB_VOTE_AVERAGE)));
                     tvOverview.setText(data.getString(Constants.RV_COL_MSB_OVERVIEW));
 
                     List<String> urls = new ArrayList<>();
-                    if (data.getString(Constants.RV_COL_MSB_CAST) == null || data.getString(Constants.RV_COL_MSB_CAST).length() == 0) {
+                    String cast = data.getString(Constants.RV_COL_MSB_CAST);
+                    if (cast == null || cast.length() == 0) {
                         urls.add(Constants.buildGetMovieReview(MOVIE_ID));
                     }
                     LINK = data.getString(Constants.RV_COL_MSB_VIDEO_LINK);
+                    Debug.d("cast", cast + ":");
+                    Debug.d("LINK", LINK + ":");
                     if (LINK == null || LINK.length() == 0) {
                         urls.add(Constants.buildGetMovieVideoLink(MOVIE_ID));
                         rlVideoOverlay.setVisibility(View.GONE);

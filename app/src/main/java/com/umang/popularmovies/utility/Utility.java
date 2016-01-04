@@ -9,6 +9,8 @@ import android.view.Display;
 
 import com.umang.popularmovies.R;
 
+import java.math.RoundingMode;
+import java.text.DecimalFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -31,11 +33,11 @@ public class Utility {
 
     public static String getYear(String dateString) {
         dateString = dateString.trim();
-        if (dateString == null || dateString.length() == 0 || dateString.equalsIgnoreCase("null")) {
+        if (dateString.length() == 0 || dateString.equalsIgnoreCase("null")) {
             return "-";
         }
-        SimpleDateFormat dbDateFormat = new SimpleDateFormat(INPUT_DATE_FORMAT, Locale.ENGLISH);
-        SimpleDateFormat sdfYear = new SimpleDateFormat(REQUIRED_DATE_FORMAT, Locale.ENGLISH);
+        SimpleDateFormat dbDateFormat = new SimpleDateFormat(INPUT_DATE_FORMAT, Locale.US);
+        SimpleDateFormat sdfYear = new SimpleDateFormat(REQUIRED_DATE_FORMAT, Locale.US);
 
         Date date = null;
         try {
@@ -56,5 +58,11 @@ public class Utility {
                 .setType("text/plain")
                 .setText(con.getString(R.string.share_video, title, Constants.YOUTUBE_BASE + key));
         return builder.getIntent();
+    }
+
+    public static String parseRating(String rating) {
+        DecimalFormat df = new DecimalFormat("#.#");
+        df.setRoundingMode(RoundingMode.CEILING);
+        return df.format(Double.valueOf(rating));
     }
 }

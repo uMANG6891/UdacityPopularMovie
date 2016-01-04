@@ -14,6 +14,7 @@ import android.widget.TextView;
 import com.squareup.picasso.Picasso;
 import com.umang.popularmovies.R;
 import com.umang.popularmovies.utility.Constants;
+import com.umang.popularmovies.utility.Utility;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
@@ -42,7 +43,7 @@ public class AdapterPosters extends RecyclerView.Adapter<AdapterPosters.VH> {
     public void onBindViewHolder(VH holder, int position) {
         MOVIE_DATA.moveToPosition(position);
         holder.tvMovieName.setText(MOVIE_DATA.getString(Constants.RV_COL_MSB_TITLE));
-        holder.tvMovieRating.setText(MOVIE_DATA.getString(Constants.RV_COL_MSB_VOTE_AVERAGE));
+        holder.tvMovieRating.setText(Utility.parseRating(MOVIE_DATA.getString(Constants.RV_COL_MSB_VOTE_AVERAGE)));
         Picasso.with(con)
                 .load(Constants.BASE_IMAGE_URL + Constants.BACKDROP_SIZE + MOVIE_DATA.getString(Constants.RV_COL_MSB_POSTER_PATH))
                 .into(holder.ivPoster);

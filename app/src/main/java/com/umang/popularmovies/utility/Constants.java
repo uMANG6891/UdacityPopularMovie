@@ -14,8 +14,8 @@ public class Constants {
     public static final String BASE_MOVIE_DB_URL = "http://api.themoviedb.org/3/";
     public static final String BASE_IMAGE_URL = "http://image.tmdb.org/t/p/";
 
-    public static final double MOVIE_POSTER_MULTIPLIER = 1.5;
-    public static final double MOVIE_BACKDROP_MULTIPLIER = 0.5617977528089888; // ~( 1/1.78)
+//    public static final double MOVIE_POSTER_MULTIPLIER = 1.5;
+//    public static final double MOVIE_BACKDROP_MULTIPLIER = 0.5617977528089888; // ~( 1/1.78)
 
     public static final String SP_SORT_BY = "sp_sort_by";
 
