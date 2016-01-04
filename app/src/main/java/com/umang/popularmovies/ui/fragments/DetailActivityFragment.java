@@ -48,28 +48,26 @@ import butterknife.ButterKnife;
  */
 public class DetailActivityFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor>, View.OnClickListener, ObservableScrollViewCallbacks {
 
+    private final int LOADER_MOVIE_DETAIL = 0;
+    private final int LOADER_COMMENTS = 1;
+    private final int LOADER_FAVOURITE = 2;
     FragmentActivity con;
-
     @Bind(R.id.frag_d_rl_trailer_overlay)
     RelativeLayout rlVideoOverlay;
-
     @Bind(R.id.frag_d_ll_reviews)
     LinearLayout llReviews;
     @Bind(R.id.frag_d_ll_reviews_parent)
     LinearLayout llReviewsParent;
     @Bind(R.id.frag_d_ll_read_more)
     LinearLayout llReadMore;
-
     @Bind(R.id.frag_d_osv_scroll)
     ObservableScrollView osvScroll;
-
     @Bind(R.id.frag_d_iv_backdrop)
     ImageView ivBackdrop;
     @Bind(R.id.frag_d_iv_poster)
     ImageView ivPoster;
     @Bind(R.id.frag_d_iv_fav_movie)
     ImageView ivFavMovie;
-
     @Bind(R.id.frag_d_tv_movie_name)
     TextView tvMovieName;
     @Bind(R.id.frag_d_tv_release_date)
@@ -80,21 +78,13 @@ public class DetailActivityFragment extends Fragment implements LoaderManager.Lo
     TextView tvRating;
     @Bind(R.id.frag_d_tv_overview)
     TextView tvOverview;
-
-
     int MOVIE_ID;
     boolean IS_TWO_PANE_LAYOUT;
     String MOVIE_TITLE;
     String LINK;
     boolean IS_FAVOURITE = false;
-
-
     Menu menu;
     MenuInflater inflater;
-
-    private final int LOADER_MOVIE_DETAIL = 0;
-    private final int LOADER_COMMENTS = 1;
-    private final int LOADER_FAVOURITE = 2;
 
     @Nullable
     @Override
@@ -294,7 +284,7 @@ public class DetailActivityFragment extends Fragment implements LoaderManager.Lo
         super.onOptionsItemSelected(item);
         switch (item.getItemId()) {
             case android.R.id.home:
-                con.finish();
+                con.onBackPressed();
                 return true;
             case R.id.menu_action_share:
                 Utility.shareYouTubeVideo(con, MOVIE_TITLE, LINK);

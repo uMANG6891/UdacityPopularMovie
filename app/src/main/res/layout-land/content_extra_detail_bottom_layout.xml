@@ -15,6 +15,7 @@
         <ImageView
             android:id="@+id/frag_d_iv_poster"
             android:layout_width="@dimen/poster_small_width"
+            android:transitionName="@string/transition_movie_poster"
             android:layout_height="@dimen/poster_small_height"
             android:layout_marginLeft="@dimen/activity_vertical_margin"
             android:layout_marginStart="@dimen/activity_vertical_margin"

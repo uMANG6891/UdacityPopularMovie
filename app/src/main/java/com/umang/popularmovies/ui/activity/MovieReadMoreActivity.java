@@ -15,10 +15,9 @@ import butterknife.Bind;
  */
 public class MovieReadMoreActivity extends AppCompatActivity {
 
+    public static final String EXTRA_MOVIE_ID = "extra_movie_id";
     @Bind(R.id.frag_d_tb_toolbar)
     Toolbar toolbar;
-
-    public static final String EXTRA_MOVIE_ID = "extra_movie_id";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

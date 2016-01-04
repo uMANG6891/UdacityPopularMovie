@@ -28,16 +28,63 @@ import java.util.Vector;
 public class FetchAsyncData extends AsyncTask<List, Void, Void> {
 
     public static final String LOG_TAG = FetchAsyncData.class.getSimpleName();
-
-    Context con;
-
     public static String GET_CAST;
     public static String GET_VIDEO_LINK;
     public static String GET_REVIEWS;
     public static String GET_SIMILAR_MOVIES;
+    Context con;
 
     public FetchAsyncData(Context con) {
         this.con = con;
+    }
+
+    public static String getFromInternet(String MOVIE_URL) {
+        Debug.d("url", MOVIE_URL);
+        HttpURLConnection urlConnection = null;
+        BufferedReader reader = null;
+
+        String data = null;
+
+        try {
+            Uri builtUri = Uri.parse(MOVIE_URL);
+
+            URL url = new URL(builtUri.toString());
+
+            urlConnection = (HttpURLConnection) url.openConnection();
+            urlConnection.setRequestMethod("GET");
+            urlConnection.connect();
+
+            InputStream inputStream = urlConnection.getInputStream();
+            StringBuilder buffer = new StringBuilder();
+            if (inputStream == null) {
+                return null;
+            }
+            reader = new BufferedReader(new InputStreamReader(inputStream));
+
+            String line;
+            while ((line = reader.readLine()) != null) {
+                buffer.append(line).append("\n");
+            }
+
+            if (buffer.length() == 0) {
+                return null;
+            }
+            data = buffer.toString();
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            if (urlConnection != null) {
+                urlConnection.disconnect();
+            }
+            if (reader != null) {
+                try {
+                    reader.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+        return data;
     }
 
     @Override
@@ -161,54 +208,5 @@ public class FetchAsyncData extends AsyncTask<List, Void, Void> {
                         MovieContract.MovieEntry.COLUMN_MOVIE_ID + " = ?",
                         new String[]{movieId});
         }
-    }
-
-    public static String getFromInternet(String MOVIE_URL) {
-        Debug.d("url", MOVIE_URL);
-        HttpURLConnection urlConnection = null;
-        BufferedReader reader = null;
-
-        String data = null;
-
-        try {
-            Uri builtUri = Uri.parse(MOVIE_URL);
-
-            URL url = new URL(builtUri.toString());
-
-            urlConnection = (HttpURLConnection) url.openConnection();
-            urlConnection.setRequestMethod("GET");
-            urlConnection.connect();
-
-            InputStream inputStream = urlConnection.getInputStream();
-            StringBuilder buffer = new StringBuilder();
-            if (inputStream == null) {
-                return null;
-            }
-            reader = new BufferedReader(new InputStreamReader(inputStream));
-
-            String line;
-            while ((line = reader.readLine()) != null) {
-                buffer.append(line).append("\n");
-            }
-
-            if (buffer.length() == 0) {
-                return null;
-            }
-            data = buffer.toString();
-        } catch (IOException e) {
-            e.printStackTrace();
-        } finally {
-            if (urlConnection != null) {
-                urlConnection.disconnect();
-            }
-            if (reader != null) {
-                try {
-                    reader.close();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
-        }
-        return data;
     }
 }

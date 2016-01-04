@@ -51,6 +51,57 @@ public class MovieSyncAdapter extends AbstractThreadedSyncAdapter {
         super(context, autoInitialize);
     }
 
+    public static void configurePeriodicSync(Context context, int syncInterval, int flexTime) {
+        Account account = getSyncAccount(context);
+        String authority = context.getString(R.string.content_authority);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+            // we can enable inexact timers in our periodic sync
+            SyncRequest request = new SyncRequest.Builder().
+                    syncPeriodic(syncInterval, flexTime).
+                    setSyncAdapter(account, authority).
+                    setExtras(new Bundle()).build();
+            ContentResolver.requestSync(request);
+        } else {
+            ContentResolver.addPeriodicSync(account,
+                    authority, new Bundle(), syncInterval);
+        }
+    }
+
+    public static MovieSyncAdapter build(Context context) {
+        MovieSyncAdapter movieSyncAdapter = new MovieSyncAdapter(context, true);
+        return movieSyncAdapter;
+    }
+
+    private static void makeSync(Context context, int sync) {
+        Bundle bundle = new Bundle();
+        bundle.putBoolean(ContentResolver.SYNC_EXTRAS_EXPEDITED, true);
+        bundle.putBoolean(ContentResolver.SYNC_EXTRAS_MANUAL, true);
+        bundle.putInt(EXTRA_SYNC_TYPE, sync);
+        ContentResolver.requestSync(getSyncAccount(context),
+                context.getString(R.string.content_authority), bundle);
+    }
+
+    public static Account getSyncAccount(Context context) {
+        AccountManager accountManager = (AccountManager) context.getSystemService(Context.ACCOUNT_SERVICE);
+
+        Account newAccount = new Account(context.getString(R.string.app_name), context.getString(R.string.sync_account_type));
+
+        if (null == accountManager.getPassword(newAccount)) {
+
+            if (!accountManager.addAccountExplicitly(newAccount, "", null)) {
+                return null;
+            }
+            onAccountCreated(newAccount, context);
+        }
+        return newAccount;
+    }
+
+    private static void onAccountCreated(Account newAccount, Context context) {
+        MovieSyncAdapter.configurePeriodicSync(context, SYNC_INTERVAL, SYNC_FLEXTIME);
+        ContentResolver.setSyncAutomatically(newAccount, context.getString(R.string.content_authority), true);
+        MovieSyncAdapter.build(context).syncImmediately(context, SYNC_BOTH);
+    }
+
     @Override
     public void onPerformSync(Account account, Bundle extras, String authority, ContentProviderClient provider, SyncResult syncResult) {
 
@@ -124,7 +175,6 @@ public class MovieSyncAdapter extends AbstractThreadedSyncAdapter {
                 + Constants.MOVIE_DB_API_KEY;
     }
 
-
     private void saveMovies(String s, int saveMovieFor) {
         try {
             JSONObject joData = new JSONObject(s);
@@ -176,7 +226,6 @@ public class MovieSyncAdapter extends AbstractThreadedSyncAdapter {
         }
     }
 
-
     private boolean checkIfResultExists(String s) {
         JSONObject joData = null;
         try {
@@ -187,27 +236,6 @@ public class MovieSyncAdapter extends AbstractThreadedSyncAdapter {
         return joData != null && joData.has(Constants.MOVIE_JSON.JSON_RESULT);
     }
 
-    public static void configurePeriodicSync(Context context, int syncInterval, int flexTime) {
-        Account account = getSyncAccount(context);
-        String authority = context.getString(R.string.content_authority);
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-            // we can enable inexact timers in our periodic sync
-            SyncRequest request = new SyncRequest.Builder().
-                    syncPeriodic(syncInterval, flexTime).
-                    setSyncAdapter(account, authority).
-                    setExtras(new Bundle()).build();
-            ContentResolver.requestSync(request);
-        } else {
-            ContentResolver.addPeriodicSync(account,
-                    authority, new Bundle(), syncInterval);
-        }
-    }
-
-    public static MovieSyncAdapter build(Context context) {
-        MovieSyncAdapter movieSyncAdapter = new MovieSyncAdapter(context, true);
-        return movieSyncAdapter;
-    }
-
     public void syncImmediately(Context context, int sync) {
         makeSync(context, sync);
     }
@@ -215,36 +243,6 @@ public class MovieSyncAdapter extends AbstractThreadedSyncAdapter {
     public void syncImmediately(Context context, int sync, SyncMovies callback) {
         makeSync(context, sync);
         callback.onSyncComplete();
-    }
-
-    private static void makeSync(Context context, int sync) {
-        Bundle bundle = new Bundle();
-        bundle.putBoolean(ContentResolver.SYNC_EXTRAS_EXPEDITED, true);
-        bundle.putBoolean(ContentResolver.SYNC_EXTRAS_MANUAL, true);
-        bundle.putInt(EXTRA_SYNC_TYPE, sync);
-        ContentResolver.requestSync(getSyncAccount(context),
-                context.getString(R.string.content_authority), bundle);
-    }
-
-    public static Account getSyncAccount(Context context) {
-        AccountManager accountManager = (AccountManager) context.getSystemService(Context.ACCOUNT_SERVICE);
-
-        Account newAccount = new Account(context.getString(R.string.app_name), context.getString(R.string.sync_account_type));
-
-        if (null == accountManager.getPassword(newAccount)) {
-
-            if (!accountManager.addAccountExplicitly(newAccount, "", null)) {
-                return null;
-            }
-            onAccountCreated(newAccount, context);
-        }
-        return newAccount;
-    }
-
-    private static void onAccountCreated(Account newAccount, Context context) {
-        MovieSyncAdapter.configurePeriodicSync(context, SYNC_INTERVAL, SYNC_FLEXTIME);
-        ContentResolver.setSyncAutomatically(newAccount, context.getString(R.string.content_authority), true);
-        MovieSyncAdapter.build(context).syncImmediately(context, SYNC_BOTH);
     }
 
 //    public static void initializeSyncAdapter(Context context) {

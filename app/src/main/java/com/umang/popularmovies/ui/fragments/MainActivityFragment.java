@@ -40,8 +40,9 @@ import butterknife.ButterKnife;
  */
 public class MainActivityFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor>, SwipeRefreshLayout.OnRefreshListener {
 
+    private static final int LOADER_COLLECTION_MOVIES = 0;
+    private static final int LOADER_MY_FAVOURITE_MOVIES = 1;
     FragmentActivity con;
-
     @Bind(R.id.main_rv_posters)
     RecyclerView rvPosters;
     @Bind(R.id.main_pb_loading_network)
@@ -50,13 +51,8 @@ public class MainActivityFragment extends Fragment implements LoaderManager.Load
     TextView tvErrorInfo;
     @Bind(R.id.main_srl_refresh)
     SwipeRefreshLayout swipeRefreshLayout;
-
     SharedPreferences.Editor editor;
     AdapterPosters adapter;
-
-    private static final int LOADER_COLLECTION_MOVIES = 0;
-    private static final int LOADER_MY_FAVOURITE_MOVIES = 1;
-
     String[] sortItems;
 
     @Override
@@ -75,7 +71,7 @@ public class MainActivityFragment extends Fragment implements LoaderManager.Load
                 new RecyclerViewItemClickListener(con, new RecyclerViewItemClickListener.OnItemClickListener() {
                     @Override
                     public void onItemClick(View view, int position) {
-                        ((ShowMovieDetailCallback) con).onMovieItemSelected(false, adapter.getMovieId(position));
+                        ((ShowMovieDetailCallback) con).onMovieItemSelected(false, adapter.getMovieId(position), view);
                     }
                 })
         );
@@ -223,7 +219,7 @@ public class MainActivityFragment extends Fragment implements LoaderManager.Load
             data.moveToFirst();
             id = data.getInt(Constants.RV_COL_MSB_MOVIE_ID);
         }
-        ((ShowMovieDetailCallback) con).onMovieItemSelected(true, id);
+        ((ShowMovieDetailCallback) con).onMovieItemSelected(true, id, null);
     }
 
     @Override
@@ -246,7 +242,7 @@ public class MainActivityFragment extends Fragment implements LoaderManager.Load
     }
 
     public interface ShowMovieDetailCallback {
-        void onMovieItemSelected(boolean dataFromFirstLoad, int movieId);
+        void onMovieItemSelected(boolean dataFromFirstLoad, int movieId, View view);
     }
 
 

@@ -19,20 +19,52 @@ import com.umang.popularmovies.data.MovieContract.MovieEntry;
  */
 public class MovieProvider extends ContentProvider {
 
-    private static final UriMatcher sUriMatcher = buildUriMatcher();
-    private MovieDbHelper mOpenHelper;
-
     static final int MOVIE = 100;
     static final int MOVIE_ONE = 101;
-
     static final int COLLECTION = 200;
     static final int COLLECTION_SAVED_FOR = 201;
-
     static final int FAVOURITE = 300;
     static final int FAVOURITE_ONE = 301;
-
     static final int COMMENT = 400;
+    private static final UriMatcher sUriMatcher = buildUriMatcher();
+    // to get movies for saved_for
+    private static final SQLiteQueryBuilder sMovieBySavedForQueryBuilder;
+    // to get all favourite movies for saved_for
+    private static final SQLiteQueryBuilder sMovieByFavouriteQueryBuilder;
+    // to get comments for the movie_id
+    private static final SQLiteQueryBuilder sCommentByMovieQueryBuilder;
 
+    static {
+        sMovieBySavedForQueryBuilder = new SQLiteQueryBuilder();
+        //This is an inner join which looks like
+        //collection INNER JOIN movie ON collection.movie_id= movie.movie_id
+        sMovieBySavedForQueryBuilder.setTables(
+                CollectionEntry.TABLE_NAME + " INNER JOIN " + MovieEntry.TABLE_NAME +
+                        " ON " + CollectionEntry.TABLE_NAME + "." + CollectionEntry.COLUMN_MOVIE_ID +
+                        " = " + MovieEntry.TABLE_NAME + "." + MovieEntry.COLUMN_MOVIE_ID);
+    }
+
+    static {
+        sMovieByFavouriteQueryBuilder = new SQLiteQueryBuilder();
+        //This is an inner join which looks like
+        //favourite INNER JOIN movie ON favourite.movie_id= movie.movie_id
+        sMovieByFavouriteQueryBuilder.setTables(
+                FavouriteEntry.TABLE_NAME + " INNER JOIN " + MovieEntry.TABLE_NAME +
+                        " ON " + FavouriteEntry.TABLE_NAME + "." + FavouriteEntry.COLUMN_MOVIE_ID +
+                        " = " + MovieEntry.TABLE_NAME + "." + MovieEntry.COLUMN_MOVIE_ID);
+    }
+
+    static {
+        sCommentByMovieQueryBuilder = new SQLiteQueryBuilder();
+        //This is an inner join which looks like
+        //comment INNER JOIN movie ON comment.movie_id= movie.movie_id
+        sCommentByMovieQueryBuilder.setTables(
+                CommentEntry.TABLE_NAME + " INNER JOIN " + MovieEntry.TABLE_NAME +
+                        " ON " + CommentEntry.TABLE_NAME + "." + CommentEntry.COLUMN_MOVIE_ID +
+                        " = " + MovieEntry.TABLE_NAME + "." + MovieEntry.COLUMN_MOVIE_ID);
+    }
+
+    private MovieDbHelper mOpenHelper;
 
     static UriMatcher buildUriMatcher() {
         final UriMatcher matcher = new UriMatcher(UriMatcher.NO_MATCH);
@@ -52,19 +84,6 @@ public class MovieProvider extends ContentProvider {
         return matcher;
     }
 
-    // to get movies for saved_for
-    private static final SQLiteQueryBuilder sMovieBySavedForQueryBuilder;
-
-    static {
-        sMovieBySavedForQueryBuilder = new SQLiteQueryBuilder();
-        //This is an inner join which looks like
-        //collection INNER JOIN movie ON collection.movie_id= movie.movie_id
-        sMovieBySavedForQueryBuilder.setTables(
-                CollectionEntry.TABLE_NAME + " INNER JOIN " + MovieEntry.TABLE_NAME +
-                        " ON " + CollectionEntry.TABLE_NAME + "." + CollectionEntry.COLUMN_MOVIE_ID +
-                        " = " + MovieEntry.TABLE_NAME + "." + MovieEntry.COLUMN_MOVIE_ID);
-    }
-
     private Cursor getMovieBySavedFor(Uri uri, String[] projection, String sortOrder) {
         String saved_for = String.valueOf(CollectionEntry.getSavedForTypeFromUri(uri));
 
@@ -78,19 +97,6 @@ public class MovieProvider extends ContentProvider {
         );
     }
 
-    // to get all favourite movies for saved_for
-    private static final SQLiteQueryBuilder sMovieByFavouriteQueryBuilder;
-
-    static {
-        sMovieByFavouriteQueryBuilder = new SQLiteQueryBuilder();
-        //This is an inner join which looks like
-        //favourite INNER JOIN movie ON favourite.movie_id= movie.movie_id
-        sMovieByFavouriteQueryBuilder.setTables(
-                FavouriteEntry.TABLE_NAME + " INNER JOIN " + MovieEntry.TABLE_NAME +
-                        " ON " + FavouriteEntry.TABLE_NAME + "." + FavouriteEntry.COLUMN_MOVIE_ID +
-                        " = " + MovieEntry.TABLE_NAME + "." + MovieEntry.COLUMN_MOVIE_ID);
-    }
-
     private Cursor getMovieByFavourite(String[] projection, String sortOrder) {
         return sMovieByFavouriteQueryBuilder.query(mOpenHelper.getReadableDatabase(),
                 projection,
@@ -100,19 +106,6 @@ public class MovieProvider extends ContentProvider {
                 null,
                 sortOrder
         );
-    }
-
-    // to get comments for the movie_id
-    private static final SQLiteQueryBuilder sCommentByMovieQueryBuilder;
-
-    static {
-        sCommentByMovieQueryBuilder = new SQLiteQueryBuilder();
-        //This is an inner join which looks like
-        //comment INNER JOIN movie ON comment.movie_id= movie.movie_id
-        sCommentByMovieQueryBuilder.setTables(
-                CommentEntry.TABLE_NAME + " INNER JOIN " + MovieEntry.TABLE_NAME +
-                        " ON " + CommentEntry.TABLE_NAME + "." + CommentEntry.COLUMN_MOVIE_ID +
-                        " = " + MovieEntry.TABLE_NAME + "." + MovieEntry.COLUMN_MOVIE_ID);
     }
 
     private Cursor getCommentByMovieFor(Uri uri, String[] projection, String sortOrder) {

@@ -19,7 +19,6 @@ import com.umang.popularmovies.R;
 import com.umang.popularmovies.data.MovieContract;
 import com.umang.popularmovies.ui.activity.MovieReadMoreActivity;
 import com.umang.popularmovies.utility.Constants;
-import com.umang.popularmovies.utility.Debug;
 import com.umang.popularmovies.utility.Utility;
 
 import org.json.JSONArray;
