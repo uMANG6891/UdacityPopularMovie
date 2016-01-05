@@ -17,8 +17,6 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.animation.Animation;
-import android.view.animation.AnimationUtils;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
@@ -210,7 +208,7 @@ public class DetailActivityFragment extends Fragment implements LoaderManager.Lo
                         tvContent = (TextView) view.findViewById(R.id.item_r_content);
 
                         tvAuthor.setText(data.getString(Constants.RV_COL_CM_AUTHOR));
-                        tvContent.setText(data.getString(Constants.RV_COL_CM_CONTENT));
+                        tvContent.setText(Utility.shortenComment(con, data.getString(Constants.RV_COL_CM_CONTENT)));
                         llReviews.addView(view);
                     }
                 }

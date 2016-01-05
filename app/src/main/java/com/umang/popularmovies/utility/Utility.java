@@ -13,6 +13,7 @@ import java.math.RoundingMode;
 import java.text.DecimalFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.Locale;
 
@@ -64,5 +65,19 @@ public class Utility {
         DecimalFormat df = new DecimalFormat("#.#");
         df.setRoundingMode(RoundingMode.CEILING);
         return df.format(Double.valueOf(rating));
+    }
+
+    public static String shortenComment(Context con, String comment) {
+        String[] words = comment.split(" ");
+        if (words.length > Constants.MAX_WORDS_IN_COMMENT) {
+            words = Arrays.copyOf(words, Constants.MAX_WORDS_IN_COMMENT);
+            StringBuilder builder = new StringBuilder();
+            for (String s : words) {
+                builder.append(s).append(" ");
+            }
+            comment = builder.toString().trim() + con.getString(R.string.three_dots);
+
+        }
+        return comment;
     }
 }

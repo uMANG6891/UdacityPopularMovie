@@ -80,6 +80,7 @@ public class MainActivity extends AppCompatActivity implements ShowMovieDetailCa
                 i.putExtra(Constants.EXTRA_IS_TWO_PANE, isTwoPaneLayout);
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
                     View iv = view.findViewById(R.id.item_mg_iv_movie_poster);
+
                     Pair<View, String> ivPair = new Pair<>(iv, iv.getTransitionName());
                     Bundle bundle = ActivityOptions.makeSceneTransitionAnimation(this, ivPair).toBundle();
                     startActivity(i, bundle);

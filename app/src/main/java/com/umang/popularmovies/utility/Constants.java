@@ -69,6 +69,7 @@ public class Constants {
     };
     public static final int RV_COL_CM_AUTHOR = 0;
     public static final int RV_COL_CM_CONTENT = 1;
+    public static final int MAX_WORDS_IN_COMMENT = 40;
     public static String POSTER_SIZE;
     public static String BACKDROP_SIZE;
     public static String[] MOVIE_URL = new String[]{
