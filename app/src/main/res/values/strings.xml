@@ -13,8 +13,8 @@
     <string name="out_of_ten">/10</string>
     <string name="votes">votes</string>
 
-    <string name="poster_size">w185</string>
-    <string name="backdrop_size">w342</string>
+    <string name="poster_size">w342</string>
+    <string name="backdrop_size">w780</string>
     <string name="out_of_name">/10</string>
     <string name="read_more">READ MORE</string>
 

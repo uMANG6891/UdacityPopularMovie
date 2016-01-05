@@ -5,6 +5,7 @@
     android:layout_marginTop="@dimen/backdrop_height_below_layout">
 
     <LinearLayout
+        android:transitionGroup="true"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/activity_vertical_margin"

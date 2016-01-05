@@ -157,8 +157,8 @@ public class DetailActivityFragment extends Fragment implements LoaderManager.Lo
                 if (data.getCount() > 0) {
                     data.moveToFirst();
                     MOVIE_TITLE = data.getString(Constants.RV_COL_MSB_TITLE);
+                    Picasso.with(con).load(Constants.BASE_IMAGE_URL + Constants.POSTER_SIZE + data.getString(Constants.RV_COL_MSB_POSTER_PATH)).into(ivPoster);
                     Picasso.with(con).load(Constants.BASE_IMAGE_URL + Constants.BACKDROP_SIZE + data.getString(Constants.RV_COL_MSB_BACKDROP_PATH)).into(ivBackdrop);
-                    Picasso.with(con).load(Constants.BASE_IMAGE_URL + Constants.BACKDROP_SIZE + data.getString(Constants.RV_COL_MSB_POSTER_PATH)).into(ivPoster);
                     tvMovieName.setText(MOVIE_TITLE);
                     if (!IS_TWO_PANE_LAYOUT)
                         ((MovieTitle) con).getMovieTitle(MOVIE_TITLE);

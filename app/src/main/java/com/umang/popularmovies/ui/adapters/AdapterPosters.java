@@ -52,7 +52,7 @@ public class AdapterPosters extends RecyclerView.Adapter<AdapterPosters.VH> {
         holder.tvMovieName.setText(MOVIE_DATA.getString(Constants.RV_COL_MSB_TITLE));
         holder.tvMovieRating.setText(Utility.parseRating(MOVIE_DATA.getString(Constants.RV_COL_MSB_VOTE_AVERAGE)));
         Picasso.with(con.getApplicationContext())
-                .load(Constants.BASE_IMAGE_URL + Constants.BACKDROP_SIZE + MOVIE_DATA.getString(Constants.RV_COL_MSB_POSTER_PATH))
+                .load(Constants.BASE_IMAGE_URL + Constants.POSTER_SIZE + MOVIE_DATA.getString(Constants.RV_COL_MSB_POSTER_PATH))
                 .placeholder(R.drawable.glide_loading)
                 .error(R.drawable.glide_error)
                 .into(holder.ivPoster, new Callback() {

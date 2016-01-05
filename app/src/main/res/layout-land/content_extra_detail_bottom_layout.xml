@@ -8,6 +8,7 @@
         android:layout_width="450dp"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
+        android:transitionGroup="true"
         android:layout_marginBottom="@dimen/activity_vertical_margin">
 
         <include layout="@layout/content_extra_detail_movie_detail" />
