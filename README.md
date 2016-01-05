@@ -13,15 +13,20 @@ Main features of Popular Movies app:
 
 ## Using/Editing Source code
 To use the source code you will need api key from [The Movie Database](https://www.themoviedb.org/documentation/api) to retrieve data. Get your API key and paste it at:
+
     ```
     app/src/main/java/com/umang/popularmovies/utility/Constants.java
     ```
 
 ## Screenshots
 
-![screen](../master/screenshots/1.png) ![screen](../master/screenshots/2.png)
+![](../master/screenshots/phone-port-main.png)
 
-![screen](../master/screenshots/3.png)
+![](../master/screenshots/phone-port-detail.png)
+
+![](../master/screenshots/phone-land-detail.png)
+
+![](../master/screenshots/tablet-land-main.png)
 
 ## Libraries Used
 - [Android-ObservableScrollView](https://github.com/ksoichiro/Android-ObservableScrollView)
