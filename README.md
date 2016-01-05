@@ -14,9 +14,9 @@ Main features of Popular Movies app:
 ## Using/Editing Source code
 To use the source code you will need api key from [The Movie Database](https://www.themoviedb.org/documentation/api) to retrieve data. Get your API key and paste it at:
 
-    ```
-    app/src/main/java/com/umang/popularmovies/utility/Constants.java
-    ```
+```
+app/src/main/java/com/umang/popularmovies/utility/Constants.java
+```
 
 ## Screenshots
 
