@@ -19,9 +19,7 @@ To use the source code you will need api key from [The Movie Database](https://w
 
 ## Screenshots
 
-![screen](../master/screenshots/1.png)
-
-![screen](../master/screenshots/2.png)
+![screen](../master/screenshots/1.png) ![screen](../master/screenshots/2.png)
 
 ![screen](../master/screenshots/3.png)
 
