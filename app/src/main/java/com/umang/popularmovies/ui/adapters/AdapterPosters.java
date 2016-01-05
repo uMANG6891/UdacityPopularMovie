@@ -3,7 +3,7 @@ package com.umang.popularmovies.ui.adapters;
 import android.app.Activity;
 import android.content.Context;
 import android.database.Cursor;
-import android.graphics.Bitmap;
+import android.graphics.drawable.BitmapDrawable;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.graphics.Palette;
 import android.support.v7.widget.CardView;
@@ -15,9 +15,8 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import com.bumptech.glide.Glide;
-import com.bumptech.glide.request.animation.GlideAnimation;
-import com.bumptech.glide.request.target.BitmapImageViewTarget;
+import com.squareup.picasso.Callback;
+import com.squareup.picasso.Picasso;
 import com.umang.popularmovies.R;
 import com.umang.popularmovies.utility.Constants;
 import com.umang.popularmovies.utility.Utility;
@@ -52,19 +51,22 @@ public class AdapterPosters extends RecyclerView.Adapter<AdapterPosters.VH> {
         MOVIE_DATA.moveToPosition(position);
         holder.tvMovieName.setText(MOVIE_DATA.getString(Constants.RV_COL_MSB_TITLE));
         holder.tvMovieRating.setText(Utility.parseRating(MOVIE_DATA.getString(Constants.RV_COL_MSB_VOTE_AVERAGE)));
-        Glide.with(con)
+        Picasso.with(con.getApplicationContext())
                 .load(Constants.BASE_IMAGE_URL + Constants.BACKDROP_SIZE + MOVIE_DATA.getString(Constants.RV_COL_MSB_POSTER_PATH))
-                .asBitmap()
-                .into(new BitmapImageViewTarget(holder.ivPoster) {
+                .placeholder(R.drawable.glide_loading)
+                .error(R.drawable.glide_error)
+                .into(holder.ivPoster, new Callback() {
                     @Override
-                    public void onResourceReady(Bitmap resource, GlideAnimation<? super Bitmap> glideAnimation) {
-                        super.onResourceReady(resource, glideAnimation);
-                        holder.ivPoster.setImageBitmap(resource);
-                        Palette.from(resource).generate(new Palette.PaletteAsyncListener() {
-                            public void onGenerated(Palette p) {
-                                holder.llPaletteBackground.setBackgroundColor(p.getVibrantColor(baseColor));
-                            }
-                        });
+                    public void onSuccess() {
+                        Palette.from(((BitmapDrawable) holder.ivPoster.getDrawable()).getBitmap())
+                                .generate(new Palette.PaletteAsyncListener() {
+                                    public void onGenerated(Palette p) {
+                                        holder.llPaletteBackground.setBackgroundColor(p.getVibrantColor(baseColor));
+                                    }
+                                });
+                    }
+                    @Override
+                    public void onError() {
                     }
                 });
     }

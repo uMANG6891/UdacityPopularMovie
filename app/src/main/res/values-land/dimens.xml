@@ -1,7 +1,9 @@
 <resources>
-    <!-- Applied only for phones with <sw600dp -->
-    <dimen name="backdrop_height">300dp</dimen>
+    <!-- Applied only for phones with < sw600dp -->
+    <dimen name="backdrop_height">350dp</dimen>
     <dimen name="backdrop_height_click">164dp</dimen>
     <dimen name="backdrop_height_below_layout">164dp</dimen>
+
+    <integer name="main_grid_columns">3</integer>
 
 </resources>
