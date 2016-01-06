@@ -4,18 +4,18 @@ I made this project while my Nanodegree program with Udacity. This app uses most
 
 ## Features of Popular movies
 
-Main features of Popular Movies app:
-- List of current most popular movies and all time favorite movies
+- List of current most popular movies and all time highest rated movies
 - Read comments on the movie
 - View and share trailer
 - Mark movie as Favorite
-- App uses SQLite to save everything offline
+- App uses SQLite to save all movie data offline
+- Read more info about cast and crews
 
 ## Using/Editing Source code
-To use the source code you will need api key from [The Movie Database](https://www.themoviedb.org/documentation/api) to retrieve data. Get your API key and paste it at:
+To use the source code you will need api key from [The Movie Database](https://www.themoviedb.org/documentation/api) to retrieve movies. Get your API key and paste it at:
 
 ```
-app/src/main/java/com/umang/popularmovies/utility/Constants.java
+app/build.gradle
 ```
 
 ## Screenshots

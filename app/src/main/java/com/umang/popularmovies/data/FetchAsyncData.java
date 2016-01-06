@@ -31,7 +31,6 @@ public class FetchAsyncData extends AsyncTask<List, Void, Void> {
     public static String GET_CAST;
     public static String GET_VIDEO_LINK;
     public static String GET_REVIEWS;
-    public static String GET_SIMILAR_MOVIES;
     Context con;
 
     public FetchAsyncData(Context con) {
@@ -122,9 +121,13 @@ public class FetchAsyncData extends AsyncTask<List, Void, Void> {
                 JSONArray jaCrew = new JSONArray(jo.getString("crew"));
 
                 JSONArray actors = new JSONArray();
-                for (int i = 0; i < jaCast.length() && i < 6; i++) {
+                JSONObject joPerson;
+                for (int i = 0; i < jaCast.length() && i < 8; i++) {
                     jo = jaCast.getJSONObject(i);
-                    actors.put(jo.getString("name"));
+                    joPerson = new JSONObject();
+                    joPerson.put("name", jo.getString("name"));
+                    joPerson.put("id", jo.getString("id"));
+                    actors.put(joPerson);
                 }
                 JSONObject crew = new JSONObject();
                 for (int i = 0; i < jaCrew.length(); i++) {
@@ -132,12 +135,15 @@ public class FetchAsyncData extends AsyncTask<List, Void, Void> {
                         break;
                     }
                     jo = jaCrew.getJSONObject(i);
+                    joPerson = new JSONObject();
+                    joPerson.put("name", jo.getString("name"));
+                    joPerson.put("id", jo.getString("id"));
                     if (jo.getString("job").equalsIgnoreCase("Director")) {
-                        crew.put("director", jo.getString("name"));
+                        crew.put("director", joPerson);
                     } else if (jo.getString("job").equalsIgnoreCase("Producer")) {
-                        crew.put("producer", jo.getString("name"));
-                    } else if (jo.getString("job").equalsIgnoreCase("Screenplay")) {
-                        crew.put("writer", jo.getString("name"));
+                        crew.put("producer", joPerson);
+                    } else if (jo.getString("job").equalsIgnoreCase("Writer")) {
+                        crew.put("writer", joPerson);
                     }
                 }
                 CAST = new JSONObject();
@@ -192,10 +198,6 @@ public class FetchAsyncData extends AsyncTask<List, Void, Void> {
             }
             GET_REVIEWS = null;
         }
-//        case GET_SIMILAR_MOVIES:
-//        break;
-//        default:
-//        break;
         if (movieId != null) {
             ContentValues values = new ContentValues();
             if (CAST != null)

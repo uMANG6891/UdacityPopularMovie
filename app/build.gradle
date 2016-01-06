@@ -10,6 +10,7 @@ android {
         targetSdkVersion 23
         versionCode 1
         versionName "1.0"
+        resValue 'string', 'MOVIE_DB_API_KEY', '"YOUR_MOVIEDB_API_KEY"'
     }
     buildTypes {
         release {

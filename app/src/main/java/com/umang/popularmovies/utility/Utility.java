@@ -4,8 +4,13 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Point;
+import android.net.Uri;
 import android.support.v4.app.ShareCompat;
+import android.text.Spannable;
+import android.text.SpannableStringBuilder;
+import android.text.style.ClickableSpan;
 import android.view.Display;
+import android.view.View;
 
 import com.umang.popularmovies.R;
 
@@ -79,5 +84,20 @@ public class Utility {
 
         }
         return comment;
+    }
+
+    public static SpannableStringBuilder createActorUrl(final Context con, String name, final String id) {
+        SpannableStringBuilder sb = new SpannableStringBuilder();
+        sb.append(name);
+        sb.setSpan(new ClickableSpan() {
+            @Override
+            public void onClick(View widget) {
+                Uri uri = Uri.parse("https://www.themoviedb.org/person/" + id);
+                Debug.d("got", "click for:" + uri.toString());
+                Intent browserIntent = new Intent(Intent.ACTION_VIEW, uri);
+                con.startActivity(browserIntent);
+            }
+        }, 0, sb.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+        return sb;
     }
 }

@@ -170,9 +170,9 @@ public class MovieSyncAdapter extends AbstractThreadedSyncAdapter {
     private String getMovieUrl(int movieType) {
         return Constants.BASE_MOVIE_DB_URL
                 + "discover/movie?sort_by="
-                + Constants.MOVIE_URL[movieType]
+                + getContext().getString(R.string.MOVIE_DB_API_KEY)
                 + "&api_key="
-                + Constants.MOVIE_DB_API_KEY;
+                + getContext().getString(R.string.MOVIE_DB_API_KEY);
     }
 
     private void saveMovies(String s, int saveMovieFor) {

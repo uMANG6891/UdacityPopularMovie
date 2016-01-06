@@ -168,11 +168,11 @@ public class DetailActivityFragment extends Fragment implements LoaderManager.Lo
                     List<String> urls = new ArrayList<>();
                     String cast = data.getString(Constants.RV_COL_MSB_CAST);
                     if (cast == null || cast.length() == 0) {
-                        urls.add(Constants.buildGetMovieReview(MOVIE_ID));
+                        urls.add(Constants.buildGetMovieReview(con, MOVIE_ID));
                     }
                     LINK = data.getString(Constants.RV_COL_MSB_VIDEO_LINK);
                     if (LINK == null || LINK.length() == 0) {
-                        urls.add(Constants.buildGetMovieVideoLink(MOVIE_ID));
+                        urls.add(Constants.buildGetMovieVideoLink(con, MOVIE_ID));
                         rlVideoOverlay.setVisibility(View.GONE);
                     } else {
                         if (menu != null && inflater != null)
@@ -190,7 +190,7 @@ public class DetailActivityFragment extends Fragment implements LoaderManager.Lo
             case LOADER_COMMENTS:
                 if (data.getCount() == 0) {
                     List<String> urls = new ArrayList<>();
-                    urls.add(Constants.buildGetMovieComments(MOVIE_ID));
+                    urls.add(Constants.buildGetMovieComments(con, MOVIE_ID));
                     FetchAsyncData task = new FetchAsyncData(con.getBaseContext());
                     task.execute(urls);
                     llReviewsParent.setVisibility(View.GONE);

@@ -9,6 +9,8 @@ import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
+import android.text.SpannableStringBuilder;
+import android.text.method.LinkMovementMethod;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
@@ -63,6 +65,10 @@ public class MovieReadMoreFragment extends Fragment implements LoaderManager.Loa
         getLoaderManager().initLoader(0, null, this);
 
         ButterKnife.bind(this, view);
+        tvActors.setMovementMethod(LinkMovementMethod.getInstance());
+        tvDirector.setMovementMethod(LinkMovementMethod.getInstance());
+        tvProducer.setMovementMethod(LinkMovementMethod.getInstance());
+        tvWriter.setMovementMethod(LinkMovementMethod.getInstance());
         return view;
     }
 
@@ -104,12 +110,14 @@ public class MovieReadMoreFragment extends Fragment implements LoaderManager.Loa
                 try {
                     JSONObject cast = new JSONObject(castJSON);
                     if (cast.has("actors")) {
-                        String actors = "";
+                        JSONObject joActors;
+                        SpannableStringBuilder actors = new SpannableStringBuilder();
                         JSONArray jaActors = cast.getJSONArray("actors");
                         for (int i = 0; i < jaActors.length(); i++) {
-                            actors += jaActors.getString(i);
+                            joActors = jaActors.getJSONObject(i);
+                            actors.append(Utility.createActorUrl(con, joActors.getString("name"), joActors.getString("id")));
                             if (i != jaActors.length() - 1) {
-                                actors += ", ";
+                                actors.append(" ");
                             }
                         }
                         tvActors.setText(actors);
@@ -119,17 +127,20 @@ public class MovieReadMoreFragment extends Fragment implements LoaderManager.Loa
                     if (cast.has("crew")) {
                         JSONObject crew = cast.getJSONObject("crew");
                         if (crew.has("director")) {
-                            tvDirector.setText(crew.getString("director"));
+                            JSONObject joPerson = new JSONObject(crew.getString("director"));
+                            tvDirector.setText(Utility.createActorUrl(con, joPerson.getString("name"), joPerson.getString("id")));
                         } else {
                             tvDirector.setText("-");
                         }
                         if (crew.has("producer")) {
-                            tvProducer.setText(crew.getString("producer"));
+                            JSONObject joPerson = new JSONObject(crew.getString("producer"));
+                            tvProducer.setText(Utility.createActorUrl(con, joPerson.getString("name"), joPerson.getString("id")));
                         } else {
                             tvProducer.setText("-");
                         }
                         if (crew.has("writer")) {
-                            tvWriter.setText(crew.getString("writer"));
+                            JSONObject joPerson = new JSONObject(crew.getString("writer"));
+                            tvWriter.setText(Utility.createActorUrl(con, joPerson.getString("name"), joPerson.getString("id")));
                         } else {
                             tvWriter.setText("-");
                         }

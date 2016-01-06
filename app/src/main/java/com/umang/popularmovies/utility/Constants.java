@@ -1,5 +1,8 @@
 package com.umang.popularmovies.utility;
 
+import android.content.Context;
+
+import com.umang.popularmovies.R;
 import com.umang.popularmovies.data.MovieContract.CollectionEntry;
 import com.umang.popularmovies.data.MovieContract.CommentEntry;
 import com.umang.popularmovies.data.MovieContract.FavouriteEntry;
@@ -9,7 +12,6 @@ import com.umang.popularmovies.data.MovieContract.MovieEntry;
  * Created by umang on 20/11/15.
  */
 public class Constants {
-    public static final String MOVIE_DB_API_KEY = "YOUR_MOVIEDB_API_KEY"; // Enter your themoviedb api key here
 
     public static final String BASE_MOVIE_DB_URL = "http://api.themoviedb.org/3/";
     public static final String BASE_IMAGE_URL = "http://image.tmdb.org/t/p/";
@@ -79,16 +81,16 @@ public class Constants {
             // to account for movie being rated 10 with only been rated once or twice
     };
 
-    public static String buildGetMovieReview(int MOVIE_ID) {
-        return BASE_MOVIE_DB_URL + "movie/" + MOVIE_ID + "/credits?api_key=" + MOVIE_DB_API_KEY;
+    public static String buildGetMovieReview(Context con, int MOVIE_ID) {
+        return BASE_MOVIE_DB_URL + "movie/" + MOVIE_ID + "/credits?api_key=" + con.getString(R.string.MOVIE_DB_API_KEY);
     }
 
-    public static String buildGetMovieVideoLink(int MOVIE_ID) {
-        return Constants.BASE_MOVIE_DB_URL + "movie/" + MOVIE_ID + "/videos?api_key=" + Constants.MOVIE_DB_API_KEY;
+    public static String buildGetMovieVideoLink(Context con, int MOVIE_ID) {
+        return Constants.BASE_MOVIE_DB_URL + "movie/" + MOVIE_ID + "/videos?api_key=" + con.getString(R.string.MOVIE_DB_API_KEY);
     }
 
-    public static String buildGetMovieComments(int MOVIE_ID) {
-        return Constants.BASE_MOVIE_DB_URL + "movie/" + MOVIE_ID + "/reviews?api_key=" + Constants.MOVIE_DB_API_KEY;
+    public static String buildGetMovieComments(Context con, int MOVIE_ID) {
+        return Constants.BASE_MOVIE_DB_URL + "movie/" + MOVIE_ID + "/reviews?api_key=" + con.getString(R.string.MOVIE_DB_API_KEY);
     }
 
     public class MOVIE_JSON {

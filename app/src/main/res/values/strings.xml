@@ -7,7 +7,7 @@
     <string name="activity_detail_title">Movie detail</string>
 
     <string name="error_no_movies_found">No movies found</string>
-    <string name="error_getting_data">Loading data.\nMake sure you have active internet connection.</string>
+    <string name="error_getting_data">Loading data…\nMake sure you have active internet connection…</string>
     <string name="error_server_error">Server error!</string>
 
     <string name="out_of_ten">/10</string>
