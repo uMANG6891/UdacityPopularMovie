@@ -1,6 +1,7 @@
 # Popular Movies (Udacity Nanodegree Project - P2)
 
 I made this project while my Nanodegree program with Udacity. This app uses most of the Material guidelines.
+Marked Exceeds Specifications by Udacity Reviewers.
 
 ## Features of Popular movies
 
